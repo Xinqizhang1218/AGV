@@ -1,0 +1,797 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "2026-08-21 ChArUco 静止重复测量精度分析",
+    "generatedAt": "2026-08-21T03:35:54.697500+00:00",
+    "cards": [
+      {
+        "id": "image_stability",
+        "description": "17 张当前图相对 10:02:40 基准图的角点变化。",
+        "dataset": "overview",
+        "sourceId": "debug_images",
+        "metrics": [
+          {
+            "label": "共同角点",
+            "field": "common_corners",
+            "format": "number"
+          },
+          {
+            "label": "最大中心位移 (px)",
+            "field": "max_center_shift_px",
+            "format": "number"
+          },
+          {
+            "label": "最大角点 RMS (px)",
+            "field": "corner_rms_max_px",
+            "format": "number"
+          },
+          {
+            "label": "最大单角点差 (px)",
+            "field": "max_single_corner_px",
+            "format": "number"
+          }
+        ]
+      },
+      {
+        "id": "returned_range",
+        "description": "接口 targetFlangePose 的六轴增量模长。",
+        "dataset": "overview",
+        "sourceId": "precision_log",
+        "metrics": [
+          {
+            "label": "平移均值 (mm)",
+            "field": "translation_mean_mm",
+            "format": "number"
+          },
+          {
+            "label": "平移最大 (mm)",
+            "field": "translation_max_mm",
+            "format": "number"
+          },
+          {
+            "label": "旋转均值 (deg)",
+            "field": "rotation_mean_deg",
+            "format": "number"
+          },
+          {
+            "label": "旋转最大 (deg)",
+            "field": "rotation_max_deg",
+            "format": "number"
+          }
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "pixel_vs_translation",
+        "title": "角点差异与返回平移模长几乎无相关",
+        "subtitle": "每个点代表一次静止重复测量。",
+        "type": "scatter",
+        "dataset": "measurements",
+        "sourceId": "debug_images",
+        "encodings": {
+          "x": {
+            "field": "corner_rms_px",
+            "type": "quantitative",
+            "label": "角点 RMS (px)"
+          },
+          "y": {
+            "field": "translation_norm_mm",
+            "type": "quantitative",
+            "label": "返回平移模长 (mm)"
+          },
+          "color": {
+            "field": "test_label",
+            "type": "nominal",
+            "label": "测量序号"
+          }
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "measurement_detail",
+        "title": "17 次图片差异与接口返回明细",
+        "subtitle": "图片指标由 raw.jpg 重新检测；六轴值来自 targetFlangePose。",
+        "dataset": "measurements",
+        "sourceId": "precision_log",
+        "density": "dense",
+        "layout": "full",
+        "defaultSort": {
+          "field": "test",
+          "direction": "asc"
+        },
+        "columns": [
+          {
+            "field": "test",
+            "label": "序号",
+            "type": "number"
+          },
+          {
+            "field": "time",
+            "label": "时间",
+            "type": "text"
+          },
+          {
+            "field": "common_corners",
+            "label": "角点数",
+            "type": "number"
+          },
+          {
+            "field": "center_dx_px",
+            "label": "中心 dx(px)",
+            "format": "number"
+          },
+          {
+            "field": "center_dy_px",
+            "label": "中心 dy(px)",
+            "format": "number"
+          },
+          {
+            "field": "corner_rms_px",
+            "label": "角点 RMS(px)",
+            "format": "number"
+          },
+          {
+            "field": "max_corner_px",
+            "label": "最大角点差(px)",
+            "format": "number"
+          },
+          {
+            "field": "pnp_reproj_rmse_px",
+            "label": "PnP 重投影(px)",
+            "format": "number"
+          },
+          {
+            "field": "x_mm",
+            "label": "X(mm)",
+            "format": "number"
+          },
+          {
+            "field": "y_mm",
+            "label": "Y(mm)",
+            "format": "number"
+          },
+          {
+            "field": "z_mm",
+            "label": "Z(mm)",
+            "format": "number"
+          },
+          {
+            "field": "translation_norm_mm",
+            "label": "平移模长(mm)",
+            "format": "number"
+          },
+          {
+            "field": "rx_deg",
+            "label": "Rx(deg)",
+            "format": "number"
+          },
+          {
+            "field": "ry_deg",
+            "label": "Ry(deg)",
+            "format": "number"
+          },
+          {
+            "field": "rz_deg",
+            "label": "Rz(deg)",
+            "format": "number"
+          },
+          {
+            "field": "rotation_norm_deg",
+            "label": "旋转模长(deg)",
+            "format": "number"
+          }
+        ]
+      },
+      {
+        "id": "axis_summary",
+        "title": "六轴重复测量统计",
+        "subtitle": "SD 为样本标准差；P2P 为最大值减最小值。",
+        "dataset": "axis_summary",
+        "sourceId": "precision_log",
+        "density": "dense",
+        "columns": [
+          {
+            "field": "axis",
+            "label": "轴",
+            "type": "text"
+          },
+          {
+            "field": "mean",
+            "label": "均值",
+            "format": "number"
+          },
+          {
+            "field": "sd",
+            "label": "标准差",
+            "format": "number"
+          },
+          {
+            "field": "p2p",
+            "label": "峰峰值",
+            "format": "number"
+          }
+        ]
+      }
+    ],
+    "sources": [
+      {
+        "id": "precision_log",
+        "label": "20260821 精度测试日志",
+        "path": "flies/20260821精度测试.md"
+      },
+      {
+        "id": "debug_images",
+        "label": "20260821 调试原图",
+        "path": "data/debug/20260821"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# 2026-08-21 ChArUco 静止重复测量精度分析"
+      },
+      {
+        "id": "answer",
+        "type": "markdown",
+        "body": "## 结论\n\n**图片没有差很多。** 17 次均稳定识别同一组 16/16 角点；相对基准图的整板角点 RMS 只有 **0.122–0.196 px**，最坏单角点差 **0.394 px**，最大中心位移 **0.172 px**。这些差异肉眼基本不可见。接口仍返回 **0.099–0.746 mm** 和 **0.011–0.130°**，说明较大的六轴波动主要来自平面 PnP 对亚像素角点噪声的姿态敏感性及后续手眼坐标变换，而不是标定板真的在图片里移动了相应幅度。"
+      },
+      {
+        "id": "image_metrics",
+        "type": "metric-strip",
+        "cardIds": [
+          "image_stability"
+        ]
+      },
+      {
+        "id": "return_metrics",
+        "type": "metric-strip",
+        "cardIds": [
+          "returned_range"
+        ]
+      },
+      {
+        "id": "relationship",
+        "type": "markdown",
+        "body": "## 图片变化能否解释返回误差？\n\n不能直接解释。角点 RMS 与平移模长的 Pearson 相关系数仅 **0.016**；去除整板平移后的角点形变 RMS 与旋转模长相关系数为 **-0.043**，都接近 0。第 12 次的图片角点 RMS 为 0.171 px，但返回平移只有 0.099 mm；第 16 次角点 RMS 也为 0.169 px，返回却达到 0.746 mm。"
+      },
+      {
+        "id": "scatter",
+        "type": "chart",
+        "chartId": "pixel_vs_translation",
+        "layout": "full"
+      },
+      {
+        "id": "detail_intro",
+        "type": "markdown",
+        "body": "## 逐次明细\n\n中心 dx/dy 和角点差均以 10:02:40 的 reference raw.jpg 为基准，按 ChArUco 角点 ID 一一配对。"
+      },
+      {
+        "id": "detail",
+        "type": "table",
+        "tableId": "measurement_detail",
+        "layout": "full"
+      },
+      {
+        "id": "repeatability",
+        "type": "markdown",
+        "body": "## 六轴重复性\n\n机械臂静止时，应同时看均值偏置和离散度。Y 均值为 -0.367 mm，说明存在系统性偏置；X/Y 的样本标准差约 0.17 mm，峰峰值分别 0.655/0.623 mm。Rz 最稳定，峰峰值仅 0.0148°；Rx/Ry 更敏感，峰峰值约 0.116/0.130°。"
+      },
+      {
+        "id": "axes",
+        "type": "table",
+        "tableId": "axis_summary"
+      },
+      {
+        "id": "method",
+        "type": "markdown",
+        "body": "## 口径与限制\n\n- 基准：10:02:40 的跨机台 reference raw.jpg。\n- 当前图：10:03:36–10:06:05 的 17 张 compensation_current/raw.jpg。\n- 图片复算：使用 settings_online.yaml 与线上相同的 ChArUco 检测器，按 16 个共同角点 ID 计算。\n- 六轴返回：直接取日志中的 data.targetFlangePose，并换算为 mm/deg。\n- raw.jpg 是调试保存的 JPEG，重新检测会受压缩影响；图片指标用于判断视觉差异量级，不替代接口运行时的内存角点。\n- 这里只能评价静止重复性，不能评价机械臂实际定位精度；定位精度还需要外部测量基准。"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-21T03:35:54.697500+00:00",
+    "status": "ready",
+    "datasets": {
+      "overview": [
+        {
+          "common_corners": 16,
+          "max_center_shift_px": 0.17163335923325082,
+          "corner_rms_max_px": 0.19556009870560095,
+          "max_single_corner_px": 0.39375902839179705,
+          "translation_mean_mm": 0.45607926102433693,
+          "translation_max_mm": 0.7458148814817462,
+          "rotation_mean_deg": 0.08066361337016958,
+          "rotation_max_deg": 0.1298207256005176
+        }
+      ],
+      "measurements": [
+        {
+          "test": 1,
+          "time": "10:03:36",
+          "common_corners": 16,
+          "center_dx_px": -0.011684417724609375,
+          "center_dy_px": 0.07385635375976562,
+          "center_shift_px": 0.07477490627376815,
+          "corner_rms_px": 0.12855792260815582,
+          "nonrigid_rms_px": 0.10457462817086069,
+          "max_corner_px": 0.20530492865886754,
+          "pnp_reproj_rmse_px": 0.1560085773399866,
+          "brightness": 118.863265625,
+          "brightness_delta": 0.025768554687502387,
+          "sharpness": 293.0214314281616,
+          "sharpness_delta": 0.25611697558576907,
+          "x_mm": 0.20405728537264967,
+          "y_mm": -0.1387577132531126,
+          "z_mm": 0.11992124593210307,
+          "translation_norm_mm": 0.274361411147406,
+          "rx_deg": 0.006584947044688006,
+          "ry_deg": -0.05409537622633596,
+          "rz_deg": 0.002354726299376011,
+          "rotation_norm_deg": 0.05454554053811505,
+          "image": "data/debug/20260821/20260821_100336_258756_compensation_current/raw.jpg",
+          "test_label": "#1"
+        },
+        {
+          "test": 2,
+          "time": "10:04:02",
+          "common_corners": 16,
+          "center_dx_px": -0.053867340087890625,
+          "center_dy_px": -0.022661209106445312,
+          "center_shift_px": 0.05843988985539336,
+          "corner_rms_px": 0.1268087774599052,
+          "nonrigid_rms_px": 0.11253997207466,
+          "max_corner_px": 0.27215626988830827,
+          "pnp_reproj_rmse_px": 0.14160004477174562,
+          "brightness": 119.0013466796875,
+          "brightness_delta": 0.16384960937500637,
+          "sharpness": 292.1023857332145,
+          "sharpness_delta": -0.6629287193613322,
+          "x_mm": -0.24442219687093036,
+          "y_mm": -0.4251201164657825,
+          "z_mm": 0.22748276537445933,
+          "translation_norm_mm": 0.5405716717415958,
+          "rx_deg": -0.10580772124776194,
+          "ry_deg": -0.01970985560247886,
+          "rz_deg": -0.01118889959606517,
+          "rotation_norm_deg": 0.10820787290066046,
+          "image": "data/debug/20260821/20260821_100402_719917_compensation_current/raw.jpg",
+          "test_label": "#2"
+        },
+        {
+          "test": 3,
+          "time": "10:04:11",
+          "common_corners": 16,
+          "center_dx_px": -0.055812835693359375,
+          "center_dy_px": -0.008813858032226562,
+          "center_shift_px": 0.05650448408353247,
+          "corner_rms_px": 0.1366865952605147,
+          "nonrigid_rms_px": 0.12446071107930237,
+          "max_corner_px": 0.28864121667870163,
+          "pnp_reproj_rmse_px": 0.16021956895060957,
+          "brightness": 119.0070458984375,
+          "brightness_delta": 0.16954882812500216,
+          "sharpness": 291.7338650995484,
+          "sharpness_delta": -1.0314493530274262,
+          "x_mm": 0.02067863965471428,
+          "y_mm": -0.25163621224577604,
+          "z_mm": 0.1501578017044647,
+          "translation_norm_mm": 0.2937613910371615,
+          "rx_deg": -0.03944793968377462,
+          "ry_deg": -0.035253919828121344,
+          "rz_deg": -0.006169140252045709,
+          "rotation_norm_deg": 0.05326384420966758,
+          "image": "data/debug/20260821/20260821_100411_625711_compensation_current/raw.jpg",
+          "test_label": "#3"
+        },
+        {
+          "test": 4,
+          "time": "10:04:19",
+          "common_corners": 16,
+          "center_dx_px": -0.03733062744140625,
+          "center_dy_px": -0.029943466186523438,
+          "center_shift_px": 0.04785589736315207,
+          "corner_rms_px": 0.12232745861915473,
+          "nonrigid_rms_px": 0.11257806278218002,
+          "max_corner_px": 0.2517100499719806,
+          "pnp_reproj_rmse_px": 0.15713308998142725,
+          "brightness": 118.962267578125,
+          "brightness_delta": 0.12477050781249943,
+          "sharpness": 291.6623349590063,
+          "sharpness_delta": -1.102979493569535,
+          "x_mm": -0.05094905230673685,
+          "y_mm": -0.4826189935249747,
+          "z_mm": 0.25792529687088117,
+          "translation_norm_mm": 0.5495838039898432,
+          "rx_deg": -0.08066254605389253,
+          "ry_deg": -0.05942307430073564,
+          "rz_deg": -0.0031353306006742803,
+          "rotation_norm_deg": 0.10023661203982608,
+          "image": "data/debug/20260821/20260821_100419_770080_compensation_current/raw.jpg",
+          "test_label": "#4"
+        },
+        {
+          "test": 5,
+          "time": "10:05:05",
+          "common_corners": 16,
+          "center_dx_px": -0.00038909912109375,
+          "center_dy_px": -0.10046768188476562,
+          "center_shift_px": 0.10046843534874274,
+          "corner_rms_px": 0.15427674995227922,
+          "nonrigid_rms_px": 0.11707864482651646,
+          "max_corner_px": 0.2942637116349679,
+          "pnp_reproj_rmse_px": 0.18946303002970802,
+          "brightness": 119.0094970703125,
+          "brightness_delta": 0.17200000000001125,
+          "sharpness": 291.4686688763037,
+          "sharpness_delta": -1.2966455762721125,
+          "x_mm": 0.2963267556029825,
+          "y_mm": -0.26626988087907755,
+          "z_mm": 0.11541705849416051,
+          "translation_norm_mm": 0.4147653468420334,
+          "rx_deg": 0.008517355287130837,
+          "ry_deg": -0.07722587381079153,
+          "rz_deg": -0.003963127381770713,
+          "rotation_norm_deg": 0.0777951624818128,
+          "image": "data/debug/20260821/20260821_100505_983585_compensation_current/raw.jpg",
+          "test_label": "#5"
+        },
+        {
+          "test": 6,
+          "time": "10:05:11",
+          "common_corners": 16,
+          "center_dx_px": -0.020755767822265625,
+          "center_dy_px": -0.11071586608886719,
+          "center_shift_px": 0.11264459552814671,
+          "corner_rms_px": 0.15679197175408127,
+          "nonrigid_rms_px": 0.1090638230800335,
+          "max_corner_px": 0.3152053082193428,
+          "pnp_reproj_rmse_px": 0.1507426708573289,
+          "brightness": 119.0135234375,
+          "brightness_delta": 0.17602636718750375,
+          "sharpness": 292.1384121069907,
+          "sharpness_delta": -0.6269023455851084,
+          "x_mm": -0.1639890807350053,
+          "y_mm": -0.45128736263722047,
+          "z_mm": 0.21950774751067215,
+          "translation_norm_mm": 0.527954878274251,
+          "rx_deg": -0.08719826559018078,
+          "ry_deg": -0.03555825923955835,
+          "rz_deg": -0.0005047998136613438,
+          "rotation_norm_deg": 0.09417102603739227,
+          "image": "data/debug/20260821/20260821_100511_840648_compensation_current/raw.jpg",
+          "test_label": "#6"
+        },
+        {
+          "test": 7,
+          "time": "10:05:15",
+          "common_corners": 16,
+          "center_dx_px": -0.042629241943359375,
+          "center_dy_px": -0.08316612243652344,
+          "center_shift_px": 0.09345510253481229,
+          "corner_rms_px": 0.13746687886591322,
+          "nonrigid_rms_px": 0.10081312709832672,
+          "max_corner_px": 0.332539113906324,
+          "pnp_reproj_rmse_px": 0.1259690500764351,
+          "brightness": 118.99752734375,
+          "brightness_delta": 0.1600302734374992,
+          "sharpness": 292.27113850042736,
+          "sharpness_delta": -0.4941759521484528,
+          "x_mm": -0.05791026373658248,
+          "y_mm": -0.5914411961187582,
+          "z_mm": 0.29322620997987436,
+          "translation_norm_mm": 0.6626748051130277,
+          "rx_deg": -0.09801903084551457,
+          "ry_deg": -0.07010059331193493,
+          "rz_deg": -0.009317546853245061,
+          "rotation_norm_deg": 0.12086620813917201,
+          "image": "data/debug/20260821/20260821_100515_501750_compensation_current/raw.jpg",
+          "test_label": "#7"
+        },
+        {
+          "test": 8,
+          "time": "10:05:20",
+          "common_corners": 16,
+          "center_dx_px": -0.023258209228515625,
+          "center_dy_px": -0.11491966247558594,
+          "center_shift_px": 0.11724961884807986,
+          "corner_rms_px": 0.1596433610720991,
+          "nonrigid_rms_px": 0.10834449508109123,
+          "max_corner_px": 0.3038961085218484,
+          "pnp_reproj_rmse_px": 0.13223318628936379,
+          "brightness": 119.0162958984375,
+          "brightness_delta": 0.1787988281250108,
+          "sharpness": 292.4550908201972,
+          "sharpness_delta": -0.3102236323786087,
+          "x_mm": 0.1832156756378378,
+          "y_mm": -0.5914887763448506,
+          "z_mm": 0.29159406096801455,
+          "translation_norm_mm": 0.6844370334319851,
+          "rx_deg": -0.05414846370082802,
+          "ry_deg": -0.10830709790762391,
+          "rz_deg": 0.0028744597673112317,
+          "rotation_norm_deg": 0.1211228553877649,
+          "image": "data/debug/20260821/20260821_100520_425750_compensation_current/raw.jpg",
+          "test_label": "#8"
+        },
+        {
+          "test": 9,
+          "time": "10:05:24",
+          "common_corners": 16,
+          "center_dx_px": -0.011699676513671875,
+          "center_dy_px": -0.171234130859375,
+          "center_shift_px": 0.17163335923325082,
+          "corner_rms_px": 0.19556009870560095,
+          "nonrigid_rms_px": 0.09373229008220305,
+          "max_corner_px": 0.33068958055573144,
+          "pnp_reproj_rmse_px": 0.14000946295555963,
+          "brightness": 119.0028798828125,
+          "brightness_delta": 0.16538281249999898,
+          "sharpness": 291.59716292327033,
+          "sharpness_delta": -1.1681515293054758,
+          "x_mm": -0.051924565899863495,
+          "y_mm": -0.3952069489970844,
+          "z_mm": 0.17832730539554809,
+          "translation_norm_mm": 0.43667530377742964,
+          "rx_deg": -0.05687701206219253,
+          "ry_deg": -0.04231396388530437,
+          "rz_deg": 0.003619408412593745,
+          "rotation_norm_deg": 0.07098285819877072,
+          "image": "data/debug/20260821/20260821_100524_932615_compensation_current/raw.jpg",
+          "test_label": "#9"
+        },
+        {
+          "test": 10,
+          "time": "10:05:40",
+          "common_corners": 16,
+          "center_dx_px": -0.027904510498046875,
+          "center_dy_px": -0.1311664581298828,
+          "center_shift_px": 0.13410183236806986,
+          "corner_rms_px": 0.17152902969036227,
+          "nonrigid_rms_px": 0.10695282409568843,
+          "max_corner_px": 0.26202978327095555,
+          "pnp_reproj_rmse_px": 0.13865227394516022,
+          "brightness": 119.0821357421875,
+          "brightness_delta": 0.2446386718750091,
+          "sharpness": 292.041452148429,
+          "sharpness_delta": -0.7238623041467918,
+          "x_mm": 0.07995671878624488,
+          "y_mm": -0.4371786730104077,
+          "z_mm": 0.2517747540642934,
+          "translation_norm_mm": 0.5107923215929728,
+          "rx_deg": -0.04789985574245894,
+          "ry_deg": -0.0680334046225462,
+          "rz_deg": 0.0008321580598096266,
+          "rotation_norm_deg": 0.08320836984174111,
+          "image": "data/debug/20260821/20260821_100540_581823_compensation_current/raw.jpg",
+          "test_label": "#10"
+        },
+        {
+          "test": 11,
+          "time": "10:05:44",
+          "common_corners": 16,
+          "center_dx_px": -0.023052215576171875,
+          "center_dy_px": -0.13660430908203125,
+          "center_shift_px": 0.13853570623759576,
+          "corner_rms_px": 0.1744279110794089,
+          "nonrigid_rms_px": 0.10598563233182481,
+          "max_corner_px": 0.33395774913640763,
+          "pnp_reproj_rmse_px": 0.16060169914330613,
+          "brightness": 119.059369140625,
+          "brightness_delta": 0.2218720703125001,
+          "sharpness": 291.0706523345908,
+          "sharpness_delta": -1.69466211798499,
+          "x_mm": 0.2112387404420435,
+          "y_mm": -0.32921284713760546,
+          "z_mm": 0.16020876157402109,
+          "translation_norm_mm": 0.4226934485759992,
+          "rx_deg": -0.01353880140275429,
+          "ry_deg": -0.07056179779358125,
+          "rz_deg": -0.00473980850169272,
+          "rotation_norm_deg": 0.0720050847921047,
+          "image": "data/debug/20260821/20260821_100544_810111_compensation_current/raw.jpg",
+          "test_label": "#11"
+        },
+        {
+          "test": 12,
+          "time": "10:05:48",
+          "common_corners": 16,
+          "center_dx_px": -0.032745361328125,
+          "center_dy_px": -0.1299285888671875,
+          "center_shift_px": 0.1339914060435523,
+          "corner_rms_px": 0.1713875600055143,
+          "nonrigid_rms_px": 0.10686439459013307,
+          "max_corner_px": 0.308023156114693,
+          "pnp_reproj_rmse_px": 0.14915301875740605,
+          "brightness": 119.0675625,
+          "brightness_delta": 0.23006542968749955,
+          "sharpness": 291.9771523423729,
+          "sharpness_delta": -0.7881621102029044,
+          "x_mm": 0.0470079240012522,
+          "y_mm": -0.08314993397584569,
+          "z_mm": 0.024583503919012317,
+          "translation_norm_mm": 0.09863064992197453,
+          "rx_deg": -0.001246196581373331,
+          "ry_deg": -0.010850769287033215,
+          "rz_deg": -0.0012414351984483167,
+          "rotation_norm_deg": 0.010992422908157978,
+          "image": "data/debug/20260821/20260821_100548_129514_compensation_current/raw.jpg",
+          "test_label": "#12"
+        },
+        {
+          "test": 13,
+          "time": "10:05:51",
+          "common_corners": 16,
+          "center_dx_px": -0.0261993408203125,
+          "center_dy_px": -0.16009140014648438,
+          "center_shift_px": 0.16222102779935982,
+          "corner_rms_px": 0.1938177420189761,
+          "nonrigid_rms_px": 0.10606439205055439,
+          "max_corner_px": 0.39375902839179705,
+          "pnp_reproj_rmse_px": 0.14498674322938074,
+          "brightness": 119.060876953125,
+          "brightness_delta": 0.22337988281250887,
+          "sharpness": 292.16865132942104,
+          "sharpness_delta": -0.5966631231547694,
+          "x_mm": 0.4102815806544813,
+          "y_mm": -0.3628241711359781,
+          "z_mm": 0.2261780259474322,
+          "translation_norm_mm": 0.5925612660361175,
+          "rx_deg": 0.010243410025678294,
+          "ry_deg": -0.10234657058192885,
+          "rz_deg": -0.007437763242864285,
+          "rotation_norm_deg": 0.10312646741207038,
+          "image": "data/debug/20260821/20260821_100551_103270_compensation_current/raw.jpg",
+          "test_label": "#13"
+        },
+        {
+          "test": 14,
+          "time": "10:05:53",
+          "common_corners": 16,
+          "center_dx_px": -0.01905059814453125,
+          "center_dy_px": -0.13300514221191406,
+          "center_shift_px": 0.1343625436811759,
+          "corner_rms_px": 0.17538625674155137,
+          "nonrigid_rms_px": 0.11272553352873282,
+          "max_corner_px": 0.27943889635019165,
+          "pnp_reproj_rmse_px": 0.14940706740419804,
+          "brightness": 119.0082626953125,
+          "brightness_delta": 0.17076562500000136,
+          "sharpness": 291.285777218777,
+          "sharpness_delta": -1.4795372337987942,
+          "x_mm": 0.015088966466847431,
+          "y_mm": -0.3758419125351464,
+          "z_mm": 0.1908379123869708,
+          "translation_norm_mm": 0.42178659169221044,
+          "rx_deg": -0.04935015225848119,
+          "ry_deg": -0.04907153275102145,
+          "rz_deg": -0.0030559592301207528,
+          "rotation_norm_deg": 0.06966198203673225,
+          "image": "data/debug/20260821/20260821_100553_897144_compensation_current/raw.jpg",
+          "test_label": "#14"
+        },
+        {
+          "test": 15,
+          "time": "10:05:56",
+          "common_corners": 16,
+          "center_dx_px": -0.016002655029296875,
+          "center_dy_px": -0.10923957824707031,
+          "center_shift_px": 0.1104054818547724,
+          "corner_rms_px": 0.15735128165946058,
+          "nonrigid_rms_px": 0.1121162584832834,
+          "max_corner_px": 0.251456643868981,
+          "pnp_reproj_rmse_px": 0.14853031447165552,
+          "brightness": 119.1092216796875,
+          "brightness_delta": 0.2717246093749992,
+          "sharpness": 291.7324354998742,
+          "sharpness_delta": -1.0328789527015942,
+          "x_mm": -0.1333800256608786,
+          "y_mm": -0.031247170465986684,
+          "z_mm": 8.729266803841895e-05,
+          "translation_norm_mm": 0.13699133011777406,
+          "rx_deg": -0.020096040203251068,
+          "ry_deg": 0.021521493125138017,
+          "rz_deg": 0.00048307136210683883,
+          "rotation_norm_deg": 0.02944925900811316,
+          "image": "data/debug/20260821/20260821_100556_126456_compensation_current/raw.jpg",
+          "test_label": "#15"
+        },
+        {
+          "test": 16,
+          "time": "10:05:59",
+          "common_corners": 16,
+          "center_dx_px": -0.03037261962890625,
+          "center_dy_px": -0.11990737915039062,
+          "center_shift_px": 0.12369428280174373,
+          "corner_rms_px": 0.16894606496389766,
+          "nonrigid_rms_px": 0.1150760499363259,
+          "max_corner_px": 0.3120622325356871,
+          "pnp_reproj_rmse_px": 0.13643719432356236,
+          "brightness": 119.1107412109375,
+          "brightness_delta": 0.27324414062501035,
+          "sharpness": 292.0025790885079,
+          "sharpness_delta": -0.7627353640679075,
+          "x_mm": 0.11466689989036993,
+          "y_mm": -0.6541535572690549,
+          "z_mm": 0.3393736333621167,
+          "translation_norm_mm": 0.7458148814817462,
+          "rx_deg": -0.07576963982393793,
+          "ry_deg": -0.10540991464863032,
+          "rz_deg": -0.0010641288287068778,
+          "rotation_norm_deg": 0.1298207256005176,
+          "image": "data/debug/20260821/20260821_100559_399239_compensation_current/raw.jpg",
+          "test_label": "#16"
+        },
+        {
+          "test": 17,
+          "time": "10:06:05",
+          "common_corners": 16,
+          "center_dx_px": -0.031494140625,
+          "center_dy_px": -0.14155006408691406,
+          "center_shift_px": 0.14501138416247447,
+          "corner_rms_px": 0.18019377303944034,
+          "nonrigid_rms_px": 0.1069649209108883,
+          "max_corner_px": 0.3126086954981838,
+          "pnp_reproj_rmse_px": 0.13661235458083845,
+          "brightness": 119.1433583984375,
+          "brightness_delta": 0.30586132812500466,
+          "sharpness": 291.3420771477421,
+          "sharpness_delta": -1.4232373048337195,
+          "x_mm": 0.14378220189659174,
+          "y_mm": -0.36654095300603373,
+          "z_mm": 0.19481082301175956,
+          "translation_norm_mm": 0.4392913026401989,
+          "rx_deg": -0.0291377311978631,
+          "ry_deg": -0.06556037651863177,
+          "rz_deg": -0.0034175690712299946,
+          "rotation_norm_deg": 0.07182513576026373,
+          "image": "data/debug/20260821/20260821_100605_100678_compensation_current/raw.jpg",
+          "test_label": "#17"
+        }
+      ],
+      "axis_summary": [
+        {
+          "axis": "X (mm)",
+          "mean": 0.060219188423295184,
+          "sd": 0.17147741742909106,
+          "p2p": 0.6547037775254116
+        },
+        {
+          "axis": "Y (mm)",
+          "mean": -0.3667044952354527,
+          "sd": 0.17377605927126727,
+          "p2p": 0.6229063868030682
+        },
+        {
+          "axis": "Z (mm)",
+          "mean": 0.19067142348022487,
+          "sd": 0.09077252473093135,
+          "p2p": 0.33928634069407826
+        },
+        {
+          "axis": "RX (deg)",
+          "mean": -0.04316786376686869,
+          "sd": 0.0379857699975773,
+          "p2p": 0.11605113127344024
+        },
+        {
+          "axis": "RY (deg)",
+          "mean": -0.056017699246536476,
+          "sd": 0.034357419012268284,
+          "p2p": 0.12982859103276193
+        },
+        {
+          "axis": "RZ (deg)",
+          "mean": -0.0026512755687839867,
+          "sd": 0.004225458618291641,
+          "p2p": 0.014808308008658915
+        }
+      ]
+    }
+  }
+}

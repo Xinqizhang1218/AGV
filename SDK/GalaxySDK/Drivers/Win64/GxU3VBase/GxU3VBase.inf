@@ -1,0 +1,141 @@
+; GxU3VBase.inf
+; GxU3VBase Digital Camera install information file
+
+[Version]
+Signature=$CHICAGO$
+Class=USBCamera
+ClassGUID={BBC1DEBB-9251-41ec-86B6-30C660BA583C}
+Provider=%ProviderName%
+PnpLockdown=1
+CatalogFile=GxU3VBase.cat
+DriverVer=12/03/2025,1.1.2512.8031
+
+[ClassInstall32]
+Addreg=USBCamClassReg     
+
+[USBCamClassReg]
+HKR,,,0,%MyClassName%
+HKR,,Icon,,-20
+
+[SourceDisksNames]
+1=%INSTDISK%,,,
+
+[ControlFlags]
+ExcludeFromSelect = *
+
+[Manufacturer]
+%MFGNAME%=Device,NT,NTx86,NTamd64
+
+;for all platforms
+[Device.NT]
+;%DESCRIPTION%=GxU3VBase, USB\VID_XXXX&PID_XXXX
+%DESCRIPTION%=GxU3VBase, USB\VID_2BA2&PID_4D55
+%DESCRIPTION%=GxU3VBase, USB\VID_2BA2&PID_4455
+%DESCRIPTIONBOOT%=GxU3VBase, USB\VID_04B4&PID_00F3
+%DESCRIPTIONBOOT%=GxU3VBase, USB\VID_04B4&PID_00F3&MI_00
+
+;for x86 platforms
+[Device.NTx86]
+;%DESCRIPTION%=GxU3VBase, USB\VID_XXXX&PID_XXXX
+%DESCRIPTION%=GxU3VBase, USB\VID_2BA2&PID_4D55
+%DESCRIPTION%=GxU3VBase, USB\VID_2BA2&PID_4455
+%DESCRIPTIONBOOT%=GxU3VBase, USB\VID_04B4&PID_00F3
+%DESCRIPTIONBOOT%=GxU3VBase, USB\VID_04B4&PID_00F3&MI_00
+
+;for x64 platforms
+[Device.NTamd64]
+;%DESCRIPTION%=GxU3VBase, USB\VID_XXXX&PID_XXXX
+%DESCRIPTION%=GxU3VBase, USB\VID_2BA2&PID_4D55
+%DESCRIPTION%=GxU3VBase, USB\VID_2BA2&PID_4455
+%DESCRIPTIONBOOT%=GxU3VBase, USB\VID_04B4&PID_00F3
+%DESCRIPTIONBOOT%=GxU3VBase, USB\VID_04B4&PID_00F3&MI_00
+
+[GxU3VBase.NT]
+CopyFiles=GxU3VBase.Files.Ext
+AddReg=GxU3VBase.AddReg
+
+[GxU3VBase.NT.HW]
+AddReg=GxU3VBase.AddReg.Guid
+
+[GxU3VBase.NT.Services]
+Addservice = GxU3VBase,2,GxU3VBase.AddService
+
+[GxU3VBase.NTx86]
+CopyFiles=GxU3VBase.Files.Ext
+AddReg=GxU3VBase.AddReg
+
+[GxU3VBase.NTx86.HW]
+AddReg=GxU3VBase.AddReg.Guid
+
+[GxU3VBase.NTx86.Services]
+Addservice = GxU3VBase,2,GxU3VBase.AddService
+
+[GxU3VBase.NTamd64]
+CopyFiles=GxU3VBase.Files.Ext
+AddReg=GxU3VBase.AddReg
+
+[GxU3VBase.NTamd64.HW]
+AddReg=GxU3VBase.AddReg.Guid
+
+[GxU3VBase.NTamd64.Services]
+Addservice = GxU3VBase,2,GxU3VBase.AddService
+
+[GxU3VBase.AddReg]
+; Deprecating - do not use in new apps to identify a CYUSB3 driver
+HKR,Parameters,DevLoader,,*ntkern
+HKR,Parameters,NTMPDriver,,GxU3VBase.sys
+
+[GxU3VBase.AddService]
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %10%\System32\Drivers\GxU3VBase.sys
+AddReg         = GxU3VBase.AddReg
+LoadOrderGroup = Base
+
+[GxU3VBase.Files.Ext]
+GxU3VBase.sys
+
+[GxU3VBase.AddReg.Guid]
+HKR,,DriverGUID,,%GxU3VBase.GUID%
+
+;-------------- WDF Coinstaller installation
+[SourceDisksFiles]
+GxU3VBase.sys=1
+WdfCoInstaller01009.dll=1 ; make sure the number matches with SourceDisksNames
+
+[DestinationDirs]
+CoInstaller_CopyFiles = 11
+GxU3VBase.Files.Ext = 12
+
+[GxU3VBase.NTamd64.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles
+
+[GxU3VBase.NTx86.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles
+
+[CoInstaller_CopyFiles]
+WdfCoInstaller01009.dll
+
+[CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[GxU3VBase.NTamd64.Wdf]
+KmdfService = GxU3VBase, GxU3VBase_wdfsect
+
+[GxU3VBase.NTx86.Wdf]
+KmdfService = GxU3VBase, GxU3VBase_wdfsect
+
+[GxU3VBase_wdfsect]
+KmdfLibraryVersion = 1.9
+
+[Strings]
+ProviderName="USB3 Vision Digital Camera"
+MFGNAME=" "
+MyClassName="Machine Vision Digital Cameras"
+INSTDISK="USB Digital Camera Installation Disc"
+DESCRIPTION="USB3 Vision Digital Camera"
+DESCRIPTIONBOOT="USB BootLoader"
+GxU3VBase.GUID="{DBC348A2-CA28-43c2-8FDD-69C37ED25028}"

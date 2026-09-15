@@ -1,0 +1,174 @@
+[Version]
+CatalogFile               = GxCXPGrabber.cat
+Class                     = %ClassName%
+ClassGuid                 = {8A8D5A7B-13FF-4332-B01C-C71D0A8D2F0A}
+DriverPackageDisplayName  = %GxCXPGrabber.DRVDESC%
+DriverPackageType         = PlugAndPlay
+DriverVer = 07/11/2025,9.21.19.670
+Provider                  = %Companyname%
+Signature                 = "$WINDOWS NT$"
+PnpLockdown               = 1
+
+[DestinationDirs]
+DefaultDestDir        = 12
+CoInstaller_CopyFiles = 11
+
+; ====================== Class Section ========================================
+[ClassInstall32]
+Addreg		= GxCXPGrabber.ClassReg
+
+[GxCXPGrabber.ClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+HKR,,DeviceCharacteristics,0x10001,0x100
+HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGWGX;;;WD)(A;;GRGWGX;;;RC)" 
+
+; ====================== Device Install Section ===============================
+[ControlFlags]
+ExcludeFromSelect = *
+
+[Manufacturer]
+%Companyname%=GxCXPGrabber,NT,NTx86,NTamd64
+
+[SourceDisksNames]
+1=%DiskName%,,,""
+
+[SourceDisksFiles]
+GxCXPGrabber.sys                           = 1
+GxMemManager.sys                           = 1
+WdfCoInstaller01011.dll                    = 1 
+
+[GxCXPGrabber.NT]
+; DisplayName                   Section			        DeviceId
+; -----------                   -------			        --------
+%GxCXPGrabber.DRVDESC%=			GxCXPGrabber_Inst,		PCI\VEN_4448&DEV_504C
+
+[GxCXPGrabber.NTx86]
+; DisplayName                   Section			        DeviceId
+; -----------                   -------			        --------
+%GxCXPGrabber.DRVDESC%=			GxCXPGrabber_Inst,		PCI\VEN_4448&DEV_504C
+
+[GxCXPGrabber.NTamd64]
+; DisplayName                   Section			        DeviceId
+; -----------                   -------			        --------
+%GxCXPGrabber.DRVDESC%=			GxCXPGrabber_Inst,		PCI\VEN_4448&DEV_504C
+
+[GxCXPGrabber_Inst.NT]
+CopyFiles   =	GxCXPGrabber.CopyFiles
+
+[GxCXPGrabber.CopyFiles]
+GxCXPGrabber.sys
+GxMemManager.sys
+
+[GxCXPGrabber_Inst.NT.HW]
+AddReg = GxCXPGrabber.EnableMSI
+
+[GxCXPGrabber.EnableMSI]
+HKR,"Interrupt Management",,0x00000010
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",,0x00000010
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",MSISupported,0x00010001,1
+HKR,"Interrupt Management\MessageSignaledInterruptProperties",MessageNumberLimit,0x00010001,32
+
+[GxCXPGrabber_Inst.NT.Services]
+AddService     = GxCXPGrabber,0x00000002,GxCXPGrabber_Service
+AddService     = GxMemManager,,GxMemManager_Service
+
+[GxCXPGrabber_Service]
+DisplayName    = %GxCXPGrabber.SVCDESC%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 3                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\GxCXPGrabber.sys
+AddReg         = GxCXPGrabber_Inst.NT.Services.AddReg
+
+[GxCXPGrabber_Inst.NT.Services.AddReg]
+HKR,Parameters,"POLL_MODE",0x00010001,0
+HKR,Parameters,"POLL_MODE_TIMEOUT",0x00010001,10
+
+[GxMemManager_Service]
+DisplayName    = %GxMemManager.SVCDESC%
+ServiceType    = 1                  ; SERVICE_KERNEL_DRIVER
+StartType      = 0                  ; SERVICE_DEMAND_START
+ErrorControl   = 1                  ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\GxMemManager.sys
+AddReg         = GxMemManager_Inst.NT.Services.AddReg
+
+[GxMemManager_Inst.NT.Services.AddReg]
+HKR,"Parameters","DeviceMemSize0",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize1",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize2",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize3",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize4",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize5",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize6",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize7",0x00010001,0x1000
+HKR,"Parameters","DeviceMemSize8",0x00010001,0x00
+HKR,"Parameters","DeviceMemSize9",0x00010001,0x00
+HKR,"Parameters","DeviceMemSizeA",0x00010001,0x00
+HKR,"Parameters","DeviceMemSizeB",0x00010001,0x00
+HKR,"Parameters","DeviceMemSizeC",0x00010001,0x00
+HKR,"Parameters","DeviceMemSizeD",0x00010001,0x00
+HKR,"Parameters","DeviceMemSizeE",0x00010001,0x00
+HKR,"Parameters","DeviceMemSizeF",0x00010001,0x00
+HKR,Result,"MemRetSize0",0x00010001,0x00
+HKR,Result,"MemPhyAddr0",0x000B0001,0x00
+HKR,Result,"MemRetSize1",0x00010001,0x00
+HKR,Result,"MemPhyAddr1",0x000B0001,0x00
+HKR,Result,"MemRetSize2",0x00010001,0x00
+HKR,Result,"MemPhyAddr2",0x000B0001,0x00
+HKR,Result,"MemRetSize3",0x00010001,0x00
+HKR,Result,"MemPhyAddr3",0x000B0001,0x00
+HKR,Result,"MemRetSize4",0x00010001,0x00
+HKR,Result,"MemPhyAddr4",0x000B0001,0x00
+HKR,Result,"MemRetSize5",0x00010001,0x00
+HKR,Result,"MemPhyAddr5",0x000B0001,0x00
+HKR,Result,"MemRetSize6",0x00010001,0x00
+HKR,Result,"MemPhyAddr6",0x000B0001,0x00
+HKR,Result,"MemRetSize7",0x00010001,0x00
+HKR,Result,"MemPhyAddr7",0x000B0001,0x00
+HKR,Result,"MemRetSize8",0x00010001,0x00
+HKR,Result,"MemPhyAddr8",0x000B0001,0x00
+HKR,Result,"MemRetSize9",0x00010001,0x00
+HKR,Result,"MemPhyAddr9",0x000B0001,0x00
+HKR,Result,"MemRetSizeA",0x00010001,0x00
+HKR,Result,"MemPhyAddrA",0x000B0001,0x00
+HKR,Result,"MemRetSizeB",0x00010001,0x00
+HKR,Result,"MemPhyAddrB",0x000B0001,0x00
+HKR,Result,"MemRetSizeC",0x00010001,0x00
+HKR,Result,"MemPhyAddrC",0x000B0001,0x00
+HKR,Result,"MemRetSizeD",0x00010001,0x00
+HKR,Result,"MemPhyAddrD",0x000B0001,0x00
+HKR,Result,"MemRetSizeE",0x00010001,0x00
+HKR,Result,"MemPhyAddrE",0x000B0001,0x00
+HKR,Result,"MemRetSizeF",0x00010001,0x00
+HKR,Result,"MemPhyAddrF",0x000B0001,0x00
+
+; ====================== WDF Coinstaller installation =========================
+
+[GxCXPGrabber_Inst.NT.CoInstallers]
+AddReg         = CoInstaller_AddReg
+CopyFiles      = CoInstaller_CopyFiles
+
+[CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01011.dll,WdfCoInstaller"
+
+[CoInstaller_CopyFiles]
+WdfCoInstaller01011.dll
+
+[GxCXPGrabber_Inst.NT.Wdf]
+KmdfService    = GxCXPGrabber, GxCXPGrabber_wdfsect
+
+[GxCXPGrabber_wdfsect]
+KmdfLibraryVersion = 1.11
+
+;======================= String Definitions ===================================
+[Strings]
+Companyname				        = "GxCXPGrabber"
+ClassName				        = "Machine Vision Frame Grabbers"
+DiskName                        = "GxCXPGrabber Install Disk"
+GxCXPGrabber.SVCDESC			= "CXP-12 Frame Grabber Driver Service"
+GxMemManager.SVCDESC			= "GxMemManager Service"
+GxCXPGrabber.DRVDESC			= "CXP-12 Frame Grabber"
+DeviceDescription		        = "CXP-12 Frame Grabber device"
+GxMemManager.Param              = "Parameters"
+GxMemManager.Ret                = "Result"

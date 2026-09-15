@@ -1,0 +1,17 @@
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Runtime data and logs
+data/
+Log/
+logs/
+outputs/
+
+# Local analysis workspace
+work/
+
+# Unrelated standalone project copied into this directory
+piperx-graspnet-project-main/
+

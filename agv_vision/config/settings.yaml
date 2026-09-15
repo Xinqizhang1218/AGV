@@ -1,0 +1,171 @@
+# =====================================================
+# 系统运行模式
+# online  = 在线模式（真实相机）
+# offline = 离线模式（读取本地图片）
+# 当前模式：离线调试模式
+# =====================================================
+mode: offline
+
+
+
+# =====================================================
+# 相机配置（离线模式下通常不生效，仅保留统一配置）
+# =====================================================
+camera:
+
+  vendor: orbbec            # online 可选：orbbec / daheng / hikvision
+
+  orbbec:
+    width: 1280
+    height: 800
+    fps: 15
+
+  daheng:
+    installer_path: 'D:\sdk\Galaxy_Windows_CN_32bits-64bits_2.6.2607.9201\Galaxy_Windows_CN_32bits-64bits_2.6.2607.9201.exe'
+    python_path: 'D:\sdk\大恒\GalaxySDK'
+    serial_number: null
+    ip_address: null
+    width: 1280
+    height: 800
+    fps: 15
+
+  hikvision:
+    installer_path: 'D:\sdk\Hikvision\MVS_SDK_V4_7_0_3_MVFG_V2_7_0_2_VC90_Runtime_STD_251113.exe'
+    python_path: 'D:\sdk\hik\MvImport'
+    serial_number: null
+    ip_address: null
+    width: 1280
+    height: 800
+    fps: 15
+
+  width: 1280              # 图像宽度（像素）
+
+  height: 800              # 图像高度（像素）
+
+  fps: 15                  # 帧率
+
+  enable_depth: false      # 是否开启深度图
+
+  timeout_ms: 2000         # 取图超时（毫秒）
+
+  prefer_format: MJPG      # 图像格式
+
+  serial_number: null      # 相机序列号
+
+  auto_exposure: true      # 自动曝光
+
+  exposure: null           # 手动曝光值
+
+  gain: null               # 增益值
+
+  auto_white_balance: true # 自动白平衡
+
+  white_balance: null      # 手动白平衡值
+
+
+
+offline:
+  scenario: secondary_compensation
+  base_dir: examples/offline_images
+
+aruco:
+  dictionary_name: DICT_5X5_50
+  marker_length_m: 0.050
+  marker_ids:
+    - 0
+
+
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.007
+#   marker_length_m: 0.004
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  square_length_m: 0.030
+  marker_length_m: 0.021
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+
+# =====================================================
+# Aruco 定位码参数（离线补偿使用）
+# =====================================================
+aruco:
+
+  dictionary_name: DICT_5X5_50
+
+  marker_length_m: 0.150
+
+  marker_ids:
+    - 0
+
+
+  preferred_origin_id: 0
+
+  pixels_per_m_fallback: 3000.0
+
+  min_markers: 1
+
+  adaptive_thresh_constant: 7.0
+
+  min_marker_perimeter_rate: 0.015
+
+  max_marker_perimeter_rate: 4.0
+
+
+cross_calibration:
+  target_type: charuco  # 可选 aruco / charuco
+  charuco_marker_id: 2
+
+# 六自由度补偿安全阈值
+compensation:
+  max_translation_m: 0.05
+  max_rotation_rad: 0.174533
+
+
+# =====================================================
+# 后端接口配置
+# 离线模式一般关闭
+# =====================================================
+backend:
+
+  enabled: false
+
+  base_url: http://127.0.0.1:9000
+
+  timeout_sec: 5.0
+
+
+# =====================================================
+# 调试配置
+# =====================================================
+debug:
+
+  save_debug_images: true     # 保存画框图、识别图
+
+  debug_dir: data/debug       # 输出目录
+
+  log_dir: logs               # 日志目录
+
+  save_result_json: true      # 保存识别结果
+
+
+# =====================================================
+# FastAPI 服务配置
+# =====================================================
+service:
+
+  host: 0.0.0.0
+
+  port: 8010

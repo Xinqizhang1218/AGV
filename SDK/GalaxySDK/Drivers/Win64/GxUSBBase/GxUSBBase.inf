@@ -1,0 +1,172 @@
+; GxUSBBase.inf
+; GxUSBBase Digital Camera install information file
+
+[Version]
+Signature=$CHICAGO$
+Class=USBCamera
+ClassGUID={BBC1DEBB-9251-41ec-86B6-30C660BA583C}
+Provider=%ProviderName%
+DriverVer=01/17/2017,1.1.1701.8171
+CatalogFile=GxUSBBase.cat
+
+[ClassInstall32]
+Addreg=USBCamClassReg     
+
+[USBCamClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-20
+
+[Manufacturer]
+%MFGNAME%=DeviceList,NTx86,NTamd64
+
+[DestinationDirs]
+DefaultDestDir=10,System32\Drivers
+
+[SourceDisksNames]
+1=%INSTDISK%,,0
+
+[SourceDisksFiles]
+GxUSBBase.sys=1
+
+[SourceDisksFiles.x86]
+GxUSBBase.sys=1
+
+[SourceDisksFiles.amd64]
+GxUSBBase.sys=1
+
+[DeviceList]
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5654
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5655
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5656
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5657
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5658
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5659
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5660
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5661
+
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5670  ; CMOS USB2.0 Series
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5680  ; CMOS USB3.0 Series
+
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5690  ; CCD USB2.0 Series
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5700  ; CCD USB3.0 Series
+
+[DeviceList.NTx86]
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5654
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5655
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5656
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5657
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5658
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5659
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5660
+;%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5661
+
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5670  ; CMOS USB2.0 Series
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5680  ; CMOS USB3.0 Series
+
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5690  ; CCD USB2.0 Series
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5700  ; CCD USB3.0 Series
+
+[DeviceList.NTamd64]
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5654
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5655
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5656
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5657
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5658
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5659
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5660
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5661
+
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5670  ; CMOS USB2.0 Series
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5680  ; CMOS USB3.0 Series
+
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5690  ; CCD USB2.0 Series
+%DESCRIPTION%=DriverInstall, USB\VID_4448&PID_5700  ; CCD USB3.0 Series
+
+;------------------------------------------------------------------------------
+;  Windows 98 Sections
+;------------------------------------------------------------------------------
+[DriverInstall]
+CopyFiles=DriverCopyFiles
+AddReg=DriverAddReg
+
+[DriverCopyFiles]
+GxUSBBase.sys
+
+[DriverAddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,GxUSBBase.sys
+
+;------------------------------------------------------------------------------
+;  x86 Sections
+;------------------------------------------------------------------------------
+[DriverInstall.NTx86]
+CopyFiles=DriverCopyFiles
+AddReg=DriverAddReg.NTx86
+
+[DriverInstall.NTx86.Services]
+AddService=GxUSBBase,2,DriverService
+
+[DriverService]
+ServiceType=1
+StartType=3
+ErrorControl=1
+ServiceBinary=%10%\system32\drivers\GxUSBBase.sys
+
+[DriverAddReg.NTx86]
+HKLM,%SPEEDPARAM%,BufferSize,0x00010001,0
+
+;------------------------------------------------------------------------------
+;  amd64 Sections
+;------------------------------------------------------------------------------
+[DriverInstall.NTamd64]
+CopyFiles=DriverCopyFiles
+AddReg=DriverAddReg.NTamd64
+
+[DriverInstall.NTamd64.Services]
+AddService=GxUSBBase,2,DriverService
+
+[DriverAddReg.NTamd64]
+HKLM,%SPEEDPARAM%,BufferSize,0x00010001,0
+
+;------------------------------------------------------------------------------
+;  WDF Coinstaller installation
+;------------------------------------------------------------------------------
+[SourceDisksFiles]
+WdfCoInstaller01009.dll=1
+
+[DestinationDirs]
+CoInstaller_CopyFiles = 11
+
+[DriverInstall.NTx86.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles
+
+[DriverInstall.NTamd64.CoInstallers]
+AddReg=CoInstaller_AddReg
+CopyFiles=CoInstaller_CopyFiles
+
+[CoInstaller_CopyFiles]
+WdfCoInstaller01009.dll
+
+[CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller01009.dll,WdfCoInstaller"
+
+[DriverInstall.NTx86.Wdf]
+KmdfService = GxUSBBase, wdfsect
+
+[DriverInstall.NTamd64.Wdf]
+KmdfService = GxUSBBase, wdfsect
+
+[wdfsect]
+KmdfLibraryVersion = 1.9
+
+;------------------------------------------------------------------------------
+;  String Definitions
+;------------------------------------------------------------------------------
+[Strings]
+ProviderName=" "
+MFGNAME=" "
+ClassName="Machine Vision Digital Cameras"
+INSTDISK="USB Digital Camera Installation Disc"
+DESCRIPTION="USB2.0 Digital Camera"
+SPEEDPARAM="System\CurrentControlSet\Services\GxUSBBase\Parameters"

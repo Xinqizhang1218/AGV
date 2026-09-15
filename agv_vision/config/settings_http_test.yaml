@@ -1,0 +1,84 @@
+mode: offline
+
+camera:
+  daheng:
+    python_path: './SDK/GalaxySDK/Development/Samples/Python'
+  hikvision:
+    python_path: './SDK/MvImport'
+
+offline:
+  scenario: station_reference
+  base_dir: D:/code/AGV/pkg2_260506/examples/offline_images
+  loop: true
+  supported_suffixes:
+    - '.jpg'
+    - '.jpeg'
+    - '.png'
+    - '.bmp'
+
+charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  square_length_m: 0.020
+  marker_length_m: 0.012
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+
+# aruco:
+#   dictionary_name: DICT_4X4_50
+#   marker_length_m: 0.040
+#   marker_ids:
+#     - 0
+#     - 1
+#     - 2
+#     - 3
+#   preferred_origin_id: 0
+#   pixels_per_m_fallback: 3000.0
+#   min_markers: 1
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.03
+#   max_marker_perimeter_rate: 4.0
+aruco:
+
+  dictionary_name: DICT_5X5_50
+
+  marker_length_m: 0.150
+
+  marker_ids:
+    - 0
+
+
+  preferred_origin_id: 0
+
+  pixels_per_m_fallback: 3000.0
+
+  min_markers: 1
+
+  adaptive_thresh_constant: 7.0
+
+  min_marker_perimeter_rate: 0.015
+
+  max_marker_perimeter_rate: 4.0
+
+compensation:
+  max_translation_m: 0.05
+  max_rotation_rad: 0.174533
+
+backend:
+  enabled: false
+  base_url: http://127.0.0.1:9000
+  timeout_sec: 5.0
+
+debug:
+  save_debug_images: true
+  debug_dir: data/debug
+  log_dir: logs
+  save_result_json: true
+
+service:
+  host: 0.0.0.0
+  port: 8088

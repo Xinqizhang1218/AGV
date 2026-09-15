@@ -1,0 +1,20 @@
+services:
+  agv-vision:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agv-vision
+    restart: unless-stopped
+    ports:
+      - "8010:8010"
+    environment:
+      TZ: Asia/Shanghai
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./agv_vision/config/settings.yaml:/app/agv_vision/config/settings.yaml:ro
+    command: >
+      python -m agv_vision.main
+      --config agv_vision/config/settings.yaml
+      serve

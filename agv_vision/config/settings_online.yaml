@@ -1,0 +1,255 @@
+# =====================================================
+# 系统运行模式
+# online  = 在线模式（真实相机）
+# offline = 离线模式（读取本地图片）
+# =====================================================
+mode: online
+
+
+# =====================================================
+# 相机配置
+# =====================================================
+camera:
+
+  # 可选：orbbec / daheng / hikvision
+  vendor: orbbec
+
+  # 每个厂商使用自己的分辨率和帧率。
+  orbbec:
+    width: 1280
+    height: 800
+    fps: 15
+
+  # installer_path 是安装包位置，程序不会自动执行安装程序。
+  # SDK 安装后，若 Python 仍无法 import，请把实际 Python 包目录填入 python_path。
+  daheng:
+    installer_path: null
+    python_path: '/app/SDK/GalaxySDK/Development/Samples/Python'
+    serial_number: null
+    ip_address: 192.168.1.101
+    width: 2448
+    height: 2048
+    fps: 15
+
+  hikvision:
+    installer_path: null
+    python_path: '/app/SDK/MvImport'
+    serial_number: null
+    ip_address: null
+    width: 1280
+    height: 800
+    fps: 15
+
+  width: 1280              # 旧配置兼容兜底；优先使用厂商配置块。
+
+  height: 800              # 旧配置兼容兜底；优先使用厂商配置块。
+
+  fps: 15                  # 旧配置兼容兜底；优先使用厂商配置块。
+
+  enable_depth: false      # 是否开启深度图（双目深度相机可用）
+
+  timeout_ms: 5000         # USB相机首帧可能较慢；超时后代码会自动重连一次
+
+  prefer_format: MJPG      # 图像格式（MJPG压缩格式）
+
+  ip_address: 192.168.1.101  # 仅 Orbbec；大恒、海康使用各自配置块中的地址
+
+  control_port: 8090        # 仅 Orbbec 网络相机使用
+
+  # serial_number: CPEP1630003E  # 指定相机序列号，多相机时使用
+
+  serial_number: null        # 当前 USB Orbbec Gemini 305 序列号
+
+  auto_exposure: false      # 自动曝光
+
+  exposure: 10000            # 手动曝光值（关闭自动曝光时生效）
+
+  gain: null               # 增益值（提高亮度但会增加噪点）
+
+  auto_white_balance: true # 自动白平衡
+
+  white_balance: null      # 手动白平衡值
+
+  # 大恒 MER3-501-59G3C-P + HN-0816-5M-C2/3X（8 mm）固定内参。
+  # 修改镜头、对焦、ROI、binning 或分辨率后必须重新标定。
+  # intrinsics:
+  #   enabled: true
+  #   image_size: [2448, 2048]
+  #   camera_matrix:
+  #     - [2318.84, 0.0, 1224.0]
+  #     - [0.0, 2318.84, 1024.0]
+  #     - [0.0, 0.0, 1.0]
+  #   dist_coeffs: [-0.2071189236, 0.1173680146, 0.0, 0.0, 0.0]
+  #   calibration_rms_px: 1.058
+  #   source: '8mm lens + 3.45um pixel pitch; distortion fitted from p01-p30'
+  intrinsics:
+    enabled: false
+    image_size: [2448, 2048]
+    camera_matrix:
+      - [2347.8142312772247, 0.0, 1224.0]
+      - [0.0, 2347.8142312772247, 1024.0]
+      - [0.0, 0.0, 1.0]
+    dist_coeffs: [-0.1864287034881238, 0.10125535169654565, 0.0, 0.0, 0.0]
+    calibration_rms_px:  0.827005167352833
+    source: '8mm lens + 3.45um pixel pitch; distortion fitted from p01-p30'
+
+
+# =====================================================
+# 离线模式配置
+# =====================================================
+offline:
+
+  scenario: station_reference   # 当前离线场景名称
+
+  base_dir: examples/offline_images  # 离线图片根目录
+
+  loop: true                    # 图片是否循环读取
+
+  supported_suffixes:           # 支持的图片格式
+    - '.jpg'
+    - '.jpeg'
+    - '.png'
+    - '.bmp'
+
+
+# =====================================================
+# Charuco 标定板参数（手眼标定使用）
+# =====================================================
+# charuco:
+
+#   dictionary_name: DICT_5X5_100   # Aruco字典类型
+
+#   squares_x: 5                    # X方向格子数
+
+#   squares_y: 5                    # Y方向格子数
+
+#   square_length_m: 0.030          # 大格边长(m)
+
+#   marker_length_m: 0.022          # 内部黑码边长(m)
+
+#   min_corners: 8                  # 至少识别角点数量
+
+#   adaptive_thresh_constant: 7.0   # 自适应阈值参数
+
+#   min_marker_perimeter_rate: 0.03 # 最小码尺寸比例
+
+#   max_marker_perimeter_rate: 4.0  # 最大码尺寸比例
+
+#   use_subpix: true               # 开启亚像素角点优化
+# charuco:
+
+#   dictionary_name: DICT_5X5_100
+
+#   squares_x: 5
+
+#   squares_y: 5
+
+#   square_length_m: 0.020
+
+#   marker_length_m: 0.012
+
+#   min_corners: 5
+
+#   adaptive_thresh_constant: 7.0
+
+#   min_marker_perimeter_rate: 0.15
+
+#   max_marker_perimeter_rate: 4.0
+
+#   use_subpix: true
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.020
+#   marker_length_m: 0.150
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  square_length_m: 0.030
+  marker_length_m: 0.022
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.008
+#   marker_length_m: 0.0056
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+
+# =====================================================
+# Aruco 定位码参数（工位定位使用）
+# =====================================================
+aruco:
+
+  dictionary_name: DICT_5X5_50
+  marker_length_m: 0.150
+  marker_ids:
+    - 0
+  preferred_origin_id: 0
+  pixels_per_m_fallback: 3000.0
+  min_markers: 1
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+
+
+cross_calibration:
+  target_type: charuco  # 使用整板 ChArUco 跨机台基准
+  charuco_marker_id: 2
+
+# 六自由度补偿安全阈值；超过阈值时接口拒绝返回可执行目标位姿
+compensation:
+  max_translation_m: 0.05
+  max_rotation_rad: 0.174533
+
+
+# =====================================================
+# 后端系统配置
+# =====================================================
+backend:
+
+  enabled: false                 # 是否启用真实后端接口
+
+  base_url: http://127.0.0.1:9000  # 后端地址
+
+  timeout_sec: 5.0              # 超时时间（秒）
+
+
+# =====================================================
+# 调试配置
+# =====================================================
+debug:
+
+  save_debug_images: true       # 保存调试图像
+
+  debug_dir: data/debug         # 调试图目录
+
+  log_dir: logs                 # 日志目录
+
+  save_result_json: true        # 保存识别结果JSON
+
+
+# =====================================================
+# FastAPI 服务配置
+# =====================================================
+service:
+
+  host: 0.0.0.0                # 所有网卡可访问
+
+  port: 8088                   # 服务端口，按后端接口文档默认心跳/服务端口
+

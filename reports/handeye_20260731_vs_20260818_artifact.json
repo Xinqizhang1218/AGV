@@ -1,0 +1,403 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "手眼标定批次身份、外参差异与现场误差诊断",
+    "description": "区分桌面成功批次、2026-07-31归档失败批次与2026-08-18批次，诊断图像质量、手眼外参与二次补偿现场误差。",
+    "generatedAt": "2026-08-26T12:00:00+08:00",
+    "cards": [
+      {
+        "id": "july_translation_rmse",
+        "description": "固定标定板在机器人基座坐标系下的平移一致性误差。",
+        "dataset": "headline_metrics",
+        "sourceId": "analysis_metrics",
+        "filter": {"metric_id": "july_translation_rmse"},
+        "metrics": [{"label": "归档失败批次平移 RMSE (mm)", "field": "value", "format": "number"}]
+      },
+      {
+        "id": "desktop_success_rmse",
+        "description": "用户提供桌面照片排除异分辨率P01后复算的固定板平移一致性误差。",
+        "dataset": "headline_metrics",
+        "sourceId": "analysis_metrics",
+        "filter": {"metric_id": "desktop_success_rmse"},
+        "metrics": [{"label": "桌面成功批次平移 RMSE (mm)", "field": "value", "format": "number"}]
+      },
+      {
+        "id": "august_translation_rmse",
+        "description": "固定标定板在机器人基座坐标系下的平移一致性误差。",
+        "dataset": "headline_metrics",
+        "sourceId": "analysis_metrics",
+        "filter": {"metric_id": "august_translation_rmse"},
+        "metrics": [{"label": "8月18日平移 RMSE (mm)", "field": "value", "format": "number"}]
+      },
+      {
+        "id": "relative_rotation",
+        "description": "两份 gTc 旋转部分的相对旋转角。",
+        "dataset": "headline_metrics",
+        "sourceId": "analysis_metrics",
+        "filter": {"metric_id": "relative_rotation"},
+        "metrics": [{"label": "两批外参相对旋转 (deg)", "field": "value", "format": "number"}]
+      },
+      {
+        "id": "relative_translation",
+        "description": "两份 gTc 平移部分的欧氏距离。",
+        "dataset": "headline_metrics",
+        "sourceId": "analysis_metrics",
+        "filter": {"metric_id": "relative_translation"},
+        "metrics": [{"label": "两批外参相对平移 (mm)", "field": "value", "format": "number"}]
+      },
+      {
+        "id": "historical_consistency",
+        "description": "8月18日相对7月30日历史基准的 gTc 差异；第二项为相对旋转。",
+        "dataset": "headline_metrics",
+        "sourceId": "analysis_metrics",
+        "filter": {"metric_id": "historical_consistency"},
+        "metrics": [
+          {"label": "8月18日对历史基准平移差 (mm)", "field": "value", "format": "number"},
+          {"label": "对应旋转差 (deg)", "field": "secondary_value", "format": "number"}
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id": "normalized_quality_chart",
+        "title": "两批标定质量指标（以7月31日为100）",
+        "subtitle": "数值越低越好；8月18日的手眼平移与旋转误差分别降至7月31日的7.67%和12.12%。",
+        "type": "bar",
+        "dataset": "normalized_quality",
+        "sourceId": "analysis_metrics",
+        "valueFormat": "number",
+        "encodings": {
+          "x": {"field": "metric", "type": "nominal", "label": "质量指标"},
+          "y": {"field": "relative_percent", "type": "quantitative", "label": "相对值（7月31日=100）"},
+          "color": {"field": "batch", "type": "nominal", "label": "标定批次"},
+          "tooltip": [
+            {"field": "actual_value", "type": "quantitative", "label": "原始数值"},
+            {"field": "unit", "type": "nominal", "label": "单位"}
+          ]
+        }
+      },
+      {
+        "id": "gtc_translation_chart",
+        "title": "gTc 平移分量对比",
+        "subtitle": "单位 mm；三轴均出现明显变化，合成平移差为85.06 mm。",
+        "type": "bar",
+        "dataset": "gtc_translation_components",
+        "sourceId": "analysis_metrics",
+        "valueFormat": "number",
+        "encodings": {
+          "x": {"field": "axis", "type": "nominal", "label": "末端坐标轴"},
+          "y": {"field": "translation_mm", "type": "quantitative", "label": "平移 (mm)"},
+          "color": {"field": "batch", "type": "nominal", "label": "标定批次"}
+        }
+      }
+    ],
+    "tables": [
+      {
+        "id": "batch_identity_table",
+        "title": "三批数据身份与质量",
+        "subtitle": "桌面24张照片经逐张SHA-256核对，与7月30日/8月4日重算图像完全一致，与7月31日17:08归档失败批次均不一致。",
+        "dataset": "batch_identity",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "order", "direction": "asc"},
+        "columns": [
+          {"field": "order", "label": "序号", "format": "number"},
+          {"field": "batch", "label": "数据批次", "type": "text"},
+          {"field": "identity", "label": "文件身份", "type": "text"},
+          {"field": "valid_samples", "label": "有效样本", "type": "text"},
+          {"field": "corner_summary", "label": "角点（最小/均值/最大）", "type": "text"},
+          {"field": "translation_rmse_mm", "label": "平移RMSE (mm)", "format": "number"},
+          {"field": "rotation_rmse_deg", "label": "旋转RMSE (deg)", "format": "number"},
+          {"field": "judgement", "label": "判断", "type": "text"}
+        ]
+      },
+      {
+        "id": "quality_table",
+        "title": "标定质量与采样完整度",
+        "subtitle": "同口径比较；7月31日的归档质量报告明确为不通过。",
+        "dataset": "quality_comparison",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "batch", "direction": "asc"},
+        "columns": [
+          {"field": "batch", "label": "批次", "type": "text"},
+          {"field": "sample_count", "label": "样本数", "format": "number"},
+          {"field": "corner_summary", "label": "ChArUco角点（最小/均值/最大）", "type": "text"},
+          {"field": "camera_rms_px", "label": "相机RMS (px)", "format": "number"},
+          {"field": "translation_rmse_mm", "label": "手眼平移RMSE (mm)", "format": "number"},
+          {"field": "rotation_rmse_deg", "label": "手眼旋转RMSE (deg)", "format": "number"},
+          {"field": "method", "label": "选中方法", "type": "text"},
+          {"field": "quality_status", "label": "归档质量状态", "type": "text"}
+        ]
+      },
+      {
+        "id": "pose_coverage_table",
+        "title": "机械臂六轴位姿覆盖",
+        "subtitle": "旋转角按 Rz×Ry×Rx 构造姿态后计算，避免欧拉角在 ±π 处跳变。",
+        "dataset": "pose_coverage",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "batch", "direction": "asc"},
+        "columns": [
+          {"field": "batch", "label": "批次", "type": "text"},
+          {"field": "sample_count", "label": "样本数", "format": "number"},
+          {"field": "xyz_span_mm", "label": "XYZ平移覆盖 (mm)", "type": "text"},
+          {"field": "median_rotation_deg", "label": "相对首帧旋转中位数 (deg)", "format": "number"},
+          {"field": "max_rotation_deg", "label": "相对首帧最大旋转 (deg)", "format": "number"},
+          {"field": "pairwise_max_deg", "label": "两两最大旋转 (deg)", "format": "number"},
+          {"field": "rotation_svd_deg", "label": "旋转向量SVD三轴覆盖 (deg)", "type": "text"},
+          {"field": "duplicate_pairs", "label": "近重复位姿", "type": "text"}
+        ]
+      },
+      {
+        "id": "capture_quality_table",
+        "title": "姿态设计与图像可用性诊断",
+        "subtitle": "完整角点帧率以每帧检出全部16个 ChArUco 角点计；图像完整度改善明显，但不能单独解释全部手眼残差差异。",
+        "dataset": "capture_quality",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "batch", "direction": "asc"},
+        "columns": [
+          {"field": "batch", "label": "批次", "type": "text"},
+          {"field": "motion_design", "label": "主要动作范围", "type": "text"},
+          {"field": "full_corner_frames", "label": "完整16角点帧", "type": "text"},
+          {"field": "full_corner_rate", "label": "完整率", "type": "text"},
+          {"field": "corner_summary", "label": "角点数（最小/均值/最大）", "type": "text"},
+          {"field": "camera_rms_px", "label": "相机RMS (px)", "format": "number"},
+          {"field": "handeye_translation_rmse_mm", "label": "手眼平移RMSE (mm)", "format": "number"},
+          {"field": "diagnosis", "label": "诊断", "type": "text"}
+        ]
+      },
+      {
+        "id": "intrinsics_table",
+        "title": "相机内参与畸变系数",
+        "subtitle": "分辨率均为1280×800；焦距变化较小，但主点和高阶畸变系数变化明显。",
+        "dataset": "intrinsics_comparison",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "batch", "direction": "asc"},
+        "columns": [
+          {"field": "batch", "label": "批次", "type": "text"},
+          {"field": "fx", "label": "fx", "format": "number"},
+          {"field": "fy", "label": "fy", "format": "number"},
+          {"field": "cx", "label": "cx", "format": "number"},
+          {"field": "cy", "label": "cy", "format": "number"},
+          {"field": "k1", "label": "k1", "format": "number"},
+          {"field": "k2", "label": "k2", "format": "number"},
+          {"field": "p1", "label": "p1", "format": "number"},
+          {"field": "p2", "label": "p2", "format": "number"},
+          {"field": "k3", "label": "k3", "format": "number"}
+        ]
+      },
+      {
+        "id": "field_diagnostic_table",
+        "title": "现场误差驱动因素",
+        "subtitle": "同一标定优劣测试必须固定reference、当前图像、当前法兰位姿和接口执行语义；当前两份请求未满足该条件。",
+        "dataset": "field_diagnostic",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "priority", "direction": "asc"},
+        "columns": [
+          {"field": "priority", "label": "优先级", "format": "number"},
+          {"field": "driver", "label": "驱动因素", "type": "text"},
+          {"field": "evidence", "label": "已验证证据", "type": "text"},
+          {"field": "magnitude", "label": "量级", "type": "text"},
+          {"field": "implication", "label": "对现场误差的含义", "type": "text"},
+          {"field": "status", "label": "判断", "type": "text"}
+        ]
+      },
+      {
+        "id": "evidence_table",
+        "title": "差异来源证据",
+        "subtitle": "区分可确认事实与基于现场数据的推断。",
+        "dataset": "evidence_items",
+        "sourceId": "analysis_metrics",
+        "defaultSort": {"field": "evidence", "direction": "asc"},
+        "columns": [
+          {"field": "evidence", "label": "证据", "type": "text"},
+          {"field": "observation", "label": "观察", "type": "text"},
+          {"field": "interpretation", "label": "解释", "type": "text"},
+          {"field": "certainty", "label": "确定性", "type": "text"}
+        ]
+      }
+    ],
+    "sources": [
+      {"id": "result_20260731", "label": "2026-07-31 手眼标定结果", "path": "data/debug/20260731/handeye_result_20260731_171330_046977.json"},
+      {"id": "samples_20260731", "label": "2026-07-31 原始样本与六轴位姿", "path": "piperx-graspnet-project-main/outputs/handeye/20260731_170812/samples.json"},
+      {"id": "quality_20260731", "label": "2026-07-31 质量报告", "path": "piperx-graspnet-project-main/outputs/handeye/20260731_170812/quality_report.json"},
+      {"id": "log_20260731", "label": "2026-07-31 服务日志", "path": "logs/20260731/agv_vision.log"},
+      {"id": "result_20260818", "label": "2026-08-18 手眼标定结果", "path": "data/debug/20260818/handeye_result_20260818_112158_004606.json"},
+      {"id": "log_20260818", "label": "2026-08-18 六轴请求与时序日志", "path": "logs/20260817/agv_vision.log"},
+      {"id": "log_20260821", "label": "2026-08-21 二次补偿重复调用日志", "path": "logs/20260821/agv_vision.log"},
+      {"id": "compensation_code", "label": "二次补偿接口与变换实现", "path": "agv_vision/api/app.py; agv_vision/vision/compensator.py; agv_vision/core/service.py"},
+      {"id": "baseline_20260730", "label": "2026-07-30 历史基准结果", "path": "pkg5_260728_2/outputs/handeye_20260730/handeye_calibration_result.json"},
+      {"id": "desktop_rerun", "label": "桌面照片对应的2026-08-04复算报告", "path": "outputs/handeye_20260804_rerun/calibration_report_rerun.md"},
+      {"id": "desktop_image_analysis", "label": "桌面照片与归档批次OpenCV/哈希复核", "path": "reports/handeye_image_quality_desktop_vs_archive.json; outputs/handeye_20260804_rerun/image_detection_checks.csv"},
+      {"id": "analysis_metrics", "label": "复核后的报告数据快照 SQL", "path": "reports/handeye_report_source.sql"}
+    ],
+    "blocks": [
+      {
+        "id": "report_title",
+        "type": "markdown",
+        "body": "# 手眼标定批次身份、外参差异与现场误差诊断\n\n技术结论：**用户提供的桌面照片对应低误差第一矩阵，不是7月31日17:08归档失败批次；第一矩阵与8月18日矩阵都属于高质量结果，现场大误差不能归因于两者的手眼外参差异。**"
+      },
+      {
+        "id": "technical_summary",
+        "type": "markdown",
+        "body": "## 结论先行：先前混入了一个独立的7月31日失败批次\n\n用户提供的桌面P01–P24与项目内7月30日图片及8月4日重算图片逐张SHA-256完全一致，与 `20260731_170812` 归档图片24/24均不一致。桌面批次排除分辨率异常的P01后使用23帧，手眼平移/旋转RMSE为 **0.248 mm / 0.147°**；8月18日为 **0.274 mm / 0.112°**，两者都很好，且 `gTc` 仅差 **3.81 mm / 0.31°**。真正失败的是另一套7月31日17:08归档数据，其RMSE为 **3.570 mm / 0.922°**，外参与8月18日相差 **85.06 mm / 54.37°**。因此必须把三批数据分开：现场补偿误差大并不是桌面第一矩阵与8月18日矩阵之间的手眼差异造成的。"
+      },
+      {"id": "headline_metrics_block", "type": "metric-strip", "cardIds": ["desktop_success_rmse", "july_translation_rmse", "august_translation_rmse", "relative_rotation", "relative_translation", "historical_consistency"]},
+      {
+        "id": "batch_identity_finding",
+        "type": "markdown",
+        "body": "## 你补充的照片证明第一套采集本身是成功的\n\n这24张照片没有明显的整体失焦或过曝：OpenCV检测结果为22/24帧完整16角点，P12与P23为14角点；亮部饱和像素占比为0，清晰度指标分布稳定。唯一明确的数据异常是P01为 **1004×627**，其余23张为 **1280×800**。既有复算流程正确排除了P01，得到0.248 mm的低平移RMSE；若把P01缩放后强行纳入，旋转RMSE会升至 **1.439°**。因此这批图片不是低误差与高误差差异的负面证据，反而证明“统一分辨率并剔除异常帧”非常关键。"
+      },
+      {"id": "batch_identity_block", "type": "table", "tableId": "batch_identity_table"},
+      {
+        "id": "field_error_diagnosis",
+        "type": "markdown",
+        "body": "## 现场误差变大不是8月外参单独造成的\n\n7月30日与8月18日 `gTc` 仅差 **3.81 mm / 0.31°**；在完全相同的参考角点与当前图像下，这种差异通常只会形成毫米以内到数毫米级的输出变化，无法解释日志中最高约38.5 mm的XY补偿。两份请求实际同时改变了reference、当前法兰位姿和API合同：reference中心移动70.82 px（按旧比例约22.98 mm），码边平均像素长度下降4.57%，reference角度变化1.75°；起始法兰位置又相差14.48 mm、`rz`相差1.20°。因此这不是受控A/B测试。"
+      },
+      {"id": "field_diagnostic_block", "type": "table", "tableId": "field_diagnostic_table"},
+      {
+        "id": "api_contract_diagnosis",
+        "type": "markdown",
+        "body": "## 新旧接口语义变化和陈旧位姿会放大误差\n\n旧流程返回明确的 `dx/dy/dtheta`；当前流程虽然把字段命名为 `targetFlangePose`，实际返回的是目标位姿减当前位姿后的六轴**增量**。下游若把它当绝对目标位姿，或对增量执行两次，结果必然错误。另一个已验证风险是：8月21日日志中相同时间戳和相同 `currentFlangePose` 被重复调用26次，而视觉服务每次都重新抓取实时图像；期间reference还从中心(721.84, 420.61)切换为(698.54, 397.90)。如果机械臂已移动却仍回传旧位姿，后续补偿会以错误起点合成并产生累积偏差。"
+      },
+      {
+        "id": "quality_findings_heading",
+        "type": "markdown",
+        "body": "## 8月18日质量显著优于7月31日17:08归档失败批次\n\n这里比较的是独立的 `20260731_170812` 失败批次，不是用户补充的桌面照片。8月18日使用30组样本，所有保存的 `center.json` 均检测到16个 ChArUco 角点；归档失败批次24组样本的角点数为8–16，均值14.29，且当次质量报告明确为不通过。"
+      },
+      {"id": "normalized_quality_block", "type": "chart", "chartId": "normalized_quality_chart"},
+      {"id": "quality_table_block", "type": "table", "tableId": "quality_table"},
+      {
+        "id": "pose_findings_heading",
+        "type": "markdown",
+        "body": "## 归档失败批次不是激励不足，而是部分姿态后图像完整度下降\n\n归档失败批次的实际六轴覆盖为 **39.57 / 39.76 / 39.27 mm**，8月18日为 **30.00 / 40.00 / 10.01 mm**；两两最大旋转分别为19.19°和16.00°，因此失败不是因为动作范围太小。归档失败批次仅 **13/24（54.2%）** 帧检出完整16角点，P23只有8角点；8月为 **30/30（100%）**。这是归档失败结果的明确贡献因素，但不是完整解释：相机重投影RMS只恶化 **1.43倍**，手眼平移RMSE却恶化 **13.04倍**，仍需排查图像—位姿同步、坐标约定、标定板是否移动或相机安装关系变化。用户提供的桌面第一套并不属于这组低完整度数据，其22/24帧为完整16角点并得到0.248 mm平移RMSE。另需注意，8月实际P03与P05几乎重复，但其余姿态仍提供了足够运动多样性。"
+      },
+      {"id": "pose_coverage_block", "type": "table", "tableId": "pose_coverage_table"},
+      {"id": "capture_quality_block", "type": "table", "tableId": "capture_quality_table"},
+      {
+        "id": "timing_findings",
+        "type": "markdown",
+        "body": "## 8月采集时序连续，未发现明显错序证据\n\n8月30张图像路径时间戳严格递增，采集区间为 **11:19:13–11:21:54**，持续161秒，帧间隔5–6秒；HTTP标定请求于 **11:21:56.928** 收到，即末帧后约2.93秒。服务端按P01–P30顺序解析。该证据可排除明显的路径乱序或缺帧，但机器人位姿与曝光时刻没有共同硬件时间戳，因此仍不能完全排除单帧错配或机械臂未稳定。"
+      },
+      {
+        "id": "extrinsic_findings_heading",
+        "type": "markdown",
+        "body": "## 外参差异是结构性的，不是数值噪声\n\n7月31日 `gTc` 平移为 `[-89.64, 10.72, 96.07] mm`，8月18日为 `[-132.57, -55.95, 65.29] mm`；差值向量为 `[-42.93, -66.67, -30.78] mm`。旋转部分的相对角达到54.37°。这类幅度通常需要用安装关系、坐标系定义或时序错误解释，不能归因于同一相机内参的轻微变化。"
+      },
+      {"id": "gtc_translation_block", "type": "chart", "chartId": "gtc_translation_chart"},
+      {
+        "id": "intrinsics_findings_heading",
+        "type": "markdown",
+        "body": "## 内参总体接近，但两批不能共享同一组畸变参数\n\n两批分辨率均为1280×800。`fx` 仅变化-0.13%，`fy` 变化-0.72%，支持“同一相机/同一分辨率”的说法；但主点 `cy` 移动12.11 px，`k2` 与 `k3` 差异较大。由于两批都在手眼求解时重新执行 `calibrateCamera`，这些畸变差异更可能反映采样覆盖、距离与透视分布不同，而不一定是镜头物理变化。"
+      },
+      {"id": "intrinsics_table_block", "type": "table", "tableId": "intrinsics_table"},
+      {
+        "id": "scope_definitions",
+        "type": "markdown",
+        "body": "## 数据范围与指标定义\n\n- **比较对象**：7月31日最终24组结果与8月18日最终30组结果。7月31日目录中更早的试采与重复导出不纳入主比较。\n- **相机 RMS**：ChArUco 多视角相机标定的像素重投影 RMS。\n- **手眼平移/旋转 RMSE**：用每组 `bTg × gTc × cTt` 推回固定标定板位姿后，相对其均值的离散程度。\n- **相对外参差**：`inv(gTc_20260731) × gTc_20260818` 的旋转角，以及两平移向量的欧氏距离。\n- **历史稳健性检查**：使用7月30日23组有效样本结果，仅用于判断8月18日是否回到此前稳定的手眼关系。"
+      },
+      {
+        "id": "methodology",
+        "type": "markdown",
+        "body": "## 分析方法\n\n1. 读取两份最终手眼 JSON，逐项比较 `cameraMatrix`、`distCoeffs`、`gTc`、候选算法误差和样本数。\n2. 从7月31日原始 `samples.json` 与7月日志复核24组六轴位姿单位、机器人到位误差与角点完整度；从8月日志还原30组六轴位姿、图像路径时间戳和请求顺序，并从每帧 `center.json` 复核角点数。\n3. 按 `Rz×Ry×Rx` 将欧拉角转换为旋转矩阵，比较XYZ平移覆盖、相对旋转角、两两最大旋转和旋转向量SVD三轴覆盖；同时搜索近重复样本。\n4. 计算两份齐次变换的相对旋转和平移。\n5. 人工查看代表性原图，并用7月30日历史标定作为独立稳健性检查。"
+      },
+      {"id": "evidence_table_block", "type": "table", "tableId": "evidence_table"},
+      {
+        "id": "limitations",
+        "type": "markdown",
+        "body": "## 限制与不确定性\n\n- 8月日志保存了完整六轴请求，但未归档独立 `quality_report.json`、逐帧PnP残差或留一法结果，因而仍不能做严格的离群点敏感性复算。\n- 角点数能证明检测完整度不同，却不能单独区分运动模糊、反光、出视野、透视过强或单帧图像—位姿错配；本报告不把某一种成像原因当作已证实事实。\n- 图像文件名和HTTP请求有时间戳，机器人位姿本身没有与相机曝光共享的硬件时间戳；时序连续不等于已经证明图像—位姿严格同步。\n- 7月31日完整样本注明平移单位m、旋转单位rad，旧代码的“自动rad/deg”在这些数值上不会触发误判；所以单位处理版本差异是风险提示，但不是已证明的唯一根因。\n- 标定产物未归档当次实际加载的完整配置快照，无法从结果文件单独证明两批的方格尺寸、marker尺寸及所有相机设置完全一致。\n- 8月18日的Park结果很好，但同批Tsai结果为18.89 mm / 3.90°，表现出明显方法敏感性。选择Park是合理的，但应通过独立验证确认。\n- 本报告能高置信度否决7月31日结果；对8月18日‘可直接上线’的判断仍为中等置信度。"
+      },
+      {
+        "id": "recommendations",
+        "type": "markdown",
+        "body": "## 建议的处理顺序\n\n1. **停止使用7月31日 `gTc`**，不要与8月18日的内参、畸变或补偿数据混用。\n2. 下一次采集采用两套方案的折中：X/Y约±15–20 mm，Z约±5–10 mm，RX/RY/RZ约±5–8°，保留多个双轴和三轴组合；24–30组有效姿态即可，重点不是继续加大角度。\n3. 设置采集硬门限：标定板不得贴近图像边缘；优先要求每帧16/16角点，少于14个直接重拍；图像清晰、无强反光；禁止重复位姿。每帧同时保存角点数、PnP重投影误差和曝光时间。\n4. **以8月18日作为当前候选标定**，但先做固定标定板独立验证：使用未参与求解的6–10组姿态，要求固定板平移RMSE建议≤1 mm、旋转RMSE建议≤0.3°，且最大误差也要单独检查。\n5. 机器人到位并稳定后再触发相机，使用同一触发或硬件时间戳绑定图像与六轴位姿；标定期间固定标定板，相机支架和线缆不得受力变化。\n6. 核对并拍照记录相机到法兰的机械安装；同时固化接口约定：`robotPoseFrame=base_to_flange`，`x/y/z=m`，`rx/ry/rz=rad`，欧拉角为 `Rz×Ry×Rx`，禁止自动猜单位。\n7. 每次归档原始请求、完整六轴位姿、配置快照、每帧角点与PnP残差、Tsai/Park结果、质量门限结论，并做留一法离群点检查和一组留出验证。"
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "body": "## 仍需现场确认的问题\n\n- 7月31日至8月18日之间，相机或支架是否拆装、换孔位、旋转或重新锁紧？\n- 两批是否来自同一台机器人、同一法兰工具坐标系和同一 `base` 坐标系？\n- 7月31日图像与机器人位姿是否由同一时间戳触发，是否存在一帧错配或网络延迟？\n- 是否能补充8月逐帧PnP残差、曝光时间与机器人稳定到位信号，以做留一法和严格同步验证？"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-26T12:00:00+08:00",
+    "status": "ready",
+    "datasets": {
+      "headline_metrics": [
+        {"metric_id": "desktop_success_rmse", "value": 0.248},
+        {"metric_id": "july_translation_rmse", "value": 3.570},
+        {"metric_id": "august_translation_rmse", "value": 0.274},
+        {"metric_id": "relative_rotation", "value": 54.371},
+        {"metric_id": "relative_translation", "value": 85.064},
+        {"metric_id": "historical_consistency", "value": 3.805, "secondary_value": 0.310}
+      ],
+      "batch_identity": [
+        {"order": 1, "batch": "桌面照片 / 7月30日 / 8月4日复算", "identity": "24张逐张哈希完全一致；对应用户第一矩阵", "valid_samples": "23（排除异分辨率P01）", "corner_summary": "14 / 15.83 / 16", "translation_rmse_mm": 0.247992, "rotation_rmse_deg": 0.146624, "judgement": "质量通过"},
+        {"order": 2, "batch": "2026-07-31 17:08归档", "identity": "与桌面24张哈希全部不同；独立失败批次", "valid_samples": "24", "corner_summary": "8 / 14.29 / 16", "translation_rmse_mm": 3.570421, "rotation_rmse_deg": 0.921929, "judgement": "质量不通过"},
+        {"order": 3, "batch": "2026-08-18", "identity": "30张独立采集；对应用户第二矩阵", "valid_samples": "30", "corner_summary": "16 / 16.00 / 16", "translation_rmse_mm": 0.273783, "rotation_rmse_deg": 0.111709, "judgement": "质量良好；需留出验证"}
+      ],
+      "normalized_quality": [
+        {"metric": "手眼平移RMSE", "batch": "2026-07-31", "relative_percent": 100.0, "actual_value": 3.570421, "unit": "mm"},
+        {"metric": "手眼平移RMSE", "batch": "2026-08-18", "relative_percent": 7.668096, "actual_value": 0.273783, "unit": "mm"},
+        {"metric": "手眼旋转RMSE", "batch": "2026-07-31", "relative_percent": 100.0, "actual_value": 0.921929, "unit": "deg"},
+        {"metric": "手眼旋转RMSE", "batch": "2026-08-18", "relative_percent": 12.116847, "actual_value": 0.111709, "unit": "deg"},
+        {"metric": "相机重投影RMS", "batch": "2026-07-31", "relative_percent": 100.0, "actual_value": 0.165512, "unit": "px"},
+        {"metric": "相机重投影RMS", "batch": "2026-08-18", "relative_percent": 70.095462, "actual_value": 0.116017, "unit": "px"}
+      ],
+      "gtc_translation_components": [
+        {"axis": "X", "batch": "2026-07-31", "translation_mm": -89.635345},
+        {"axis": "Y", "batch": "2026-07-31", "translation_mm": 10.719874},
+        {"axis": "Z", "batch": "2026-07-31", "translation_mm": 96.069448},
+        {"axis": "X", "batch": "2026-08-18", "translation_mm": -132.567131},
+        {"axis": "Y", "batch": "2026-08-18", "translation_mm": -55.954000},
+        {"axis": "Z", "batch": "2026-08-18", "translation_mm": 65.289851}
+      ],
+      "quality_comparison": [
+        {"batch_order": 1, "batch": "2026-07-31 17:08归档", "sample_count": 24, "corner_summary": "8 / 14.29 / 16", "camera_rms_px": 0.165512, "translation_rmse_mm": 3.570421, "rotation_rmse_deg": 0.921929, "method": "Park", "quality_status": "不通过（ok=false）"},
+        {"batch_order": 2, "batch": "2026-08-18", "sample_count": 30, "corner_summary": "16 / 16.00 / 16", "camera_rms_px": 0.116017, "translation_rmse_mm": 0.273783, "rotation_rmse_deg": 0.111709, "method": "Park", "quality_status": "未归档独立质量报告"}
+      ],
+      "field_diagnostic": [
+        {"priority": 1, "driver": "reference不是同一基准", "evidence": "两份请求的参考中心、边长和角度均改变", "magnitude": "70.82 px；约22.98 mm；角度1.75°", "implication": "补偿目标本身已改变，足以主导现场误差", "status": "已确认"},
+        {"priority": 2, "driver": "接口返回语义变化", "evidence": "旧版返回dx/dy/dtheta；新版targetFlangePose实际装的是六轴增量", "magnitude": "绝对位姿与增量语义相反", "implication": "若Java按绝对目标执行或重复相加，会产生大误差", "status": "代码确认；需核对Java"},
+        {"priority": 3, "driver": "重复调用使用陈旧法兰位姿", "evidence": "8月21日26次调用复用同一timestamp/currentFlangePose，但每次实时抓图", "magnitude": "XY输出最大约38.52 mm", "implication": "机械臂移动后继续使用旧起点会累积偏差", "status": "日志确认；执行状态待核对"},
+        {"priority": 4, "driver": "reference在重复测试中被替换", "evidence": "reference中心出现两组值，24次与2次", "magnitude": "X/Y范围23.30/22.71 px", "implication": "同一测试序列内部也不是固定基准", "status": "日志确认"},
+        {"priority": 5, "driver": "手眼外参差异", "evidence": "7月30日与8月18日gTc接近", "magnitude": "3.81 mm / 0.31°", "implication": "会带来毫米级影响，但不是大误差首因", "status": "已确认"},
+        {"priority": 6, "driver": "currentFlangePose不同", "evidence": "两份请求不是同一机器人起始状态", "magnitude": "位置14.48 mm；rz 1.20°", "implication": "不能直接用最终落点误差比较两套标定", "status": "已确认"}
+      ],
+      "pose_coverage": [
+        {"batch": "2026-07-31 17:08归档", "sample_count": 24, "xyz_span_mm": "39.57 / 39.76 / 39.27", "median_rotation_deg": 8.0155, "max_rotation_deg": 12.8172, "pairwise_max_deg": 19.1877, "rotation_svd_deg": "25.84 / 24.66 / 13.87", "duplicate_pairs": "无"},
+        {"batch": "2026-08-18", "sample_count": 30, "xyz_span_mm": "30.00 / 40.00 / 10.01", "median_rotation_deg": 5.0001, "max_rotation_deg": 8.7825, "pairwise_max_deg": 15.9999, "rotation_svd_deg": "21.72 / 15.61 / 9.23", "duplicate_pairs": "P03–P05（几乎相同）"}
+      ],
+      "capture_quality": [
+        {"batch_order": 1, "batch": "2026-07-31 17:08归档", "motion_design": "实际XYZ/旋转覆盖充分", "full_corner_frames": "13 / 24", "full_corner_rate": "54.2%", "corner_summary": "8 / 14.29 / 16", "camera_rms_px": 0.165512, "handeye_translation_rmse_mm": 3.570421, "diagnosis": "独立失败批次；不是桌面照片"},
+        {"batch_order": 2, "batch": "2026-08-18", "motion_design": "Z约±5 mm；旋转多为±3–8°；30组", "full_corner_frames": "30 / 30", "full_corner_rate": "100.0%", "corner_summary": "16 / 16.00 / 16", "camera_rms_px": 0.116017, "handeye_translation_rmse_mm": 0.273783, "diagnosis": "动作较温和，所有帧角点完整；P03与P05近重复"}
+      ],
+      "intrinsics_comparison": [
+        {"batch_order": 1, "batch": "2026-07-31", "fx": 613.970269, "fy": 616.897882, "cx": 637.360466, "cy": 393.124608, "k1": -0.021902, "k2": 0.013000, "p1": -0.000200, "p2": -0.001735, "k3": 0.002346},
+        {"batch_order": 2, "batch": "2026-08-18", "fx": 613.160035, "fy": 612.441245, "cx": 640.889254, "cy": 405.239469, "k1": -0.029229, "k2": 0.076615, "p1": 0.000084, "p2": -0.000156, "k3": -0.151429}
+      ],
+      "evidence_items": [
+        {"priority": 1, "evidence": "7月31日质量报告", "observation": "ok=false；平移RMSE大于2 mm", "interpretation": "该结果已被当次质量门限否决", "certainty": "确认"},
+        {"priority": 2, "evidence": "两份gTc", "observation": "相对旋转54.37°、平移85.06 mm", "interpretation": "不是同一刚性安装的正常重复性波动", "certainty": "确认"},
+        {"priority": 3, "evidence": "8月18日与7月30日历史基准", "observation": "仅差0.31°、3.81 mm", "interpretation": "8月18日回到此前稳定的手眼关系", "certainty": "确认"},
+        {"priority": 4, "evidence": "代表性原图", "observation": "7月31日背景与另两批明显不同；7月30日和8月18日背景一致", "interpretation": "7月31日使用了不同工位/安装状态或机器人姿态族", "certainty": "高概率推断"},
+        {"priority": 5, "evidence": "欧拉角约定字段", "observation": "7月31日自动rad/deg；8月18日固定rad", "interpretation": "两批运行代码版本或接口约定不同", "certainty": "确认；但非唯一根因"}
+      ]
+    }
+  },
+  "sources": [
+    {"id": "result_20260731", "label": "2026-07-31 手眼标定结果", "path": "data/debug/20260731/handeye_result_20260731_171330_046977.json"},
+    {"id": "samples_20260731", "label": "2026-07-31 原始样本与六轴位姿", "path": "piperx-graspnet-project-main/outputs/handeye/20260731_170812/samples.json"},
+    {"id": "quality_20260731", "label": "2026-07-31 质量报告", "path": "piperx-graspnet-project-main/outputs/handeye/20260731_170812/quality_report.json"},
+    {"id": "log_20260731", "label": "2026-07-31 服务日志", "path": "logs/20260731/agv_vision.log"},
+    {"id": "result_20260818", "label": "2026-08-18 手眼标定结果", "path": "data/debug/20260818/handeye_result_20260818_112158_004606.json"},
+    {"id": "log_20260818", "label": "2026-08-18 六轴请求与时序日志", "path": "logs/20260817/agv_vision.log"},
+    {"id": "log_20260821", "label": "2026-08-21 二次补偿重复调用日志", "path": "logs/20260821/agv_vision.log"},
+    {"id": "compensation_code", "label": "二次补偿接口与变换实现", "path": "agv_vision/api/app.py; agv_vision/vision/compensator.py; agv_vision/core/service.py"},
+    {"id": "baseline_20260730", "label": "2026-07-30 历史基准结果", "path": "pkg5_260728_2/outputs/handeye_20260730/handeye_calibration_result.json"},
+    {"id": "desktop_rerun", "label": "桌面照片对应的2026-08-04复算报告", "path": "outputs/handeye_20260804_rerun/calibration_report_rerun.md"},
+    {"id": "desktop_image_analysis", "label": "桌面照片与归档批次OpenCV/哈希复核", "path": "reports/handeye_image_quality_desktop_vs_archive.json; outputs/handeye_20260804_rerun/image_detection_checks.csv"},
+    {"id": "analysis_metrics", "label": "复核后的报告数据快照 SQL", "path": "reports/handeye_report_source.sql"}
+  ]
+}
