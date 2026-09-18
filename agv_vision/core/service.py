@@ -28,7 +28,8 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         self.settings = settings  # 保存应用配置对象
         self.logger = logger  # 保存日志对象
         self.source = self._build_source()  # 根据模式构建图像源（在线或离线）
-        self.charuco_detector = CharucoBoardDetector(settings.charuco)  # 初始化 Charuco 检测器
+        self.handeye_charuco_detector = CharucoBoardDetector(settings.handeye_charuco)
+        self.station_charuco_detector = CharucoBoardDetector(settings.station_charuco)  # 初始化 Charuco 检测器
         self.aruco_detector = ArucoReferenceDetector(settings.aruco)  # 初始化 Aruco 检测器
         intrinsics = settings.camera.intrinsics
         if intrinsics.enabled:
@@ -145,8 +146,8 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
                 continue
 
             try:
-                obs = self.charuco_detector.detect(image)
-                vis = self.charuco_detector.draw(image, obs)
+                obs = self.handeye_charuco_detector.detect(image)
+                vis = self.handeye_charuco_detector.draw(image, obs)
                 debug_image_path = self._save_image(f'handeye_{sample_id}', vis)
 
                 sample = HandEyeSample(
@@ -334,8 +335,8 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         if image is None:
             raise RuntimeError(f'图片读取失败: {path}')
 
-        obs = self.charuco_detector.detect(image)
-        vis = self.charuco_detector.draw(image, obs)
+        obs = self.handeye_charuco_detector.detect(image)
+        vis = self.handeye_charuco_detector.draw(image, obs)
         debug_image_path = self._save_image(f'handeye_{sample_id}', vis)
         debug_case = self._save_debug_case(
             f'handeye_{sample_id}',
@@ -426,8 +427,8 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
 
     def capture_handeye_sample(self, sample_id: str, robot_x_m: float, robot_y_m: float) -> dict:  # 采集手眼样本
         frame = self.source.grab()  # 获取一帧
-        obs = self.charuco_detector.detect(frame.color)  # 检测 Charuco
-        vis = self.charuco_detector.draw(frame.color, obs)  # 绘制可视化
+        obs = self.handeye_charuco_detector.detect(frame.color)  # 检测 Charuco
+        vis = self.handeye_charuco_detector.draw(frame.color, obs)  # 绘制可视化
         image_path = self._save_image(f'handeye_{sample_id}', vis)  # 保存可视化图片
         debug_case = self._save_debug_case(
             f'handeye_{sample_id}',
@@ -486,7 +487,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
 
     def _detect_station_reference(self, image, station_id: str, reference_type: str):
         if reference_type == 'charuco':
-            observation = self.charuco_detector.detect(image)
+            observation = self.station_charuco_detector.detect(image)
             corner_ids = observation.corner_ids or []
             corners = [
                 {'id': int(corner_id), 'x': float(point[0]), 'y': float(point[1])}
@@ -501,13 +502,13 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
                 board_angle_deg=0.0,
                 marker_count=len(observation.marker_ids or []),
                 markers=[],
-                marker_length_m=float(self.settings.charuco.marker_length_m),
+                marker_length_m=float(self.settings.station_charuco.marker_length_m),
                 preferred_origin_id=int(self.settings.cross_calibration.charuco_marker_id),
                 reference_type='charuco',
                 charuco_corners=corners,
                 charuco_object_points_m=observation.board_points_m,
             )
-            return reference, self.charuco_detector.draw(image, observation)
+            return reference, self.station_charuco_detector.draw(image, observation)
 
         reference = self.aruco_detector.detect(image, station_id=station_id)
         return reference, self.aruco_detector.draw(image, reference)
@@ -595,7 +596,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         markers = [ArucoMarkerPose2D(**m) for m in reference_payload.get('markers', [])]
         charuco_corners = reference_payload.get('charuco_corners') or []
         charuco_object_points_m = (
-            self.charuco_detector.board_points_for_corner_ids(
+            self.station_charuco_detector.board_points_for_corner_ids(
                 [int(item['id']) for item in charuco_corners]
             )
             if reference_type == 'charuco'

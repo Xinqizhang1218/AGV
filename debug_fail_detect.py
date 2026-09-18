@@ -1,29 +1,37 @@
 """Debug charuco detection on the 5 failing 626test images."""
 from pathlib import Path
+import argparse
 import cv2
 import numpy as np
 
 from agv_vision.config.settings import AppSettings
 from agv_vision.vision.common import get_aruco_dictionary
 
-ROOT = Path(r'D:\code\AGV\pkg3_260522')
-TEST_DIR = ROOT / 'examples' / '拍照位姿' / '2026.626_test'
-OUT = ROOT / 'data' / 'verify_handeye_20260626' / 'debug_fail'
+ROOT = Path(__file__).resolve().parent
+parser = argparse.ArgumentParser(description='按手眼板或工位板配置检查 ChArUco 识别')
+parser.add_argument('--purpose', choices=('handeye', 'station'), default='handeye')
+parser.add_argument('--config', type=Path, default=ROOT / 'agv_vision/config/settings.yaml')
+parser.add_argument('--image-dir', type=Path, default=ROOT / 'examples/拍照位姿/2026.626_test')
+parser.add_argument('--output-dir', type=Path, default=None)
+args = parser.parse_args()
+TEST_DIR = args.image_dir
+OUT = args.output_dir or ROOT / 'data' / 'debug_fail' / args.purpose
 OUT.mkdir(parents=True, exist_ok=True)
 
-settings = AppSettings.from_yaml(ROOT / 'agv_vision' / 'config' / 'settings.yaml')
+settings = AppSettings.from_yaml(args.config)
+board_settings = getattr(settings, f'{args.purpose}_charuco')
 aruco = cv2.aruco
-dictionary = get_aruco_dictionary(settings.charuco.dictionary_name)
+dictionary = get_aruco_dictionary(board_settings.dictionary_name)
 board = aruco.CharucoBoard(
-    (settings.charuco.squares_x, settings.charuco.squares_y),
-    settings.charuco.square_length_m,
-    settings.charuco.marker_length_m,
+    (board_settings.squares_x, board_settings.squares_y),
+    board_settings.square_length_m,
+    board_settings.marker_length_m,
     dictionary,
 )
 params = aruco.DetectorParameters()
-params.adaptiveThreshConstant = settings.charuco.adaptive_thresh_constant
-params.minMarkerPerimeterRate = settings.charuco.min_marker_perimeter_rate
-params.maxMarkerPerimeterRate = settings.charuco.max_marker_perimeter_rate
+params.adaptiveThreshConstant = board_settings.adaptive_thresh_constant
+params.minMarkerPerimeterRate = board_settings.min_marker_perimeter_rate
+params.maxMarkerPerimeterRate = board_settings.max_marker_perimeter_rate
 ch_params = aruco.CharucoParameters()
 detector = aruco.CharucoDetector(board, ch_params, params)
 

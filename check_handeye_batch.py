@@ -6,11 +6,11 @@ from agv_vision.config.settings import AppSettings
 from agv_vision.core.image_io import read_image
 from agv_vision.vision.charuco_detector import CharucoBoardDetector
 
-ROOT = Path(r'D:\code\AGV\pkg3_260522')
+ROOT = Path(__file__).resolve().parent
 IMG_DIR = ROOT / 'examples' / 'offline_images' / 'handeye_batch'
 
 settings = AppSettings.from_yaml(ROOT / 'agv_vision' / 'config' / 'settings.yaml')
-detector = CharucoBoardDetector(settings.charuco)
+detector = CharucoBoardDetector(settings.handeye_charuco)
 
 for img_path in sorted(IMG_DIR.glob('*.png')):
     img = read_image(img_path)

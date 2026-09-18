@@ -2,7 +2,7 @@ from __future__ import annotations  # 启用未来版本类型注解语法，支
 
 from pathlib import Path  # 导入 Path，用于路径拼接和文件操作
 from typing import Literal
-from pydantic import BaseModel, Field  # 导入 Pydantic 数据模型基类与字段定义
+from pydantic import BaseModel, Field, model_validator  # 导入配置模型与校验器
 import yaml  # 导入 yaml，用于读取配置文件
 
 
@@ -93,14 +93,14 @@ class CharucoSettings(BaseModel):
 
     dictionary_name: str = 'DICT_5X5_100'  # Aruco字典类型
 
-    squares_x: int = 7  # X方向格子数
-    squares_y: int = 5  # Y方向格子数
+    squares_x: int = Field(default=7, ge=2)  # X方向格子数
+    squares_y: int = Field(default=5, ge=2)  # Y方向格子数
 
-    square_length_m: float = 0.030  # 大格边长(m)
+    square_length_m: float = Field(default=0.030, gt=0, allow_inf_nan=False)
 
-    marker_length_m: float = 0.021  # 小码边长(m)
+    marker_length_m: float = Field(default=0.021, gt=0, allow_inf_nan=False)
 
-    min_corners: int = 8  # 最少检测角点数
+    min_corners: int = Field(default=8, ge=4)  # 最少检测角点数
 
     adaptive_thresh_constant: float = 7.0  # 自适应阈值参数
 
@@ -108,6 +108,14 @@ class CharucoSettings(BaseModel):
     max_marker_perimeter_rate: float = 4.0   # 最大码周长比例
 
     use_subpix: bool = True  # 是否开启亚像素角点优化
+
+    @model_validator(mode='after')
+    def validate_board_geometry(self) -> 'CharucoSettings':
+        if self.marker_length_m >= self.square_length_m:
+            raise ValueError('marker_length_m 必须小于 square_length_m（单位：米）')
+        if self.min_corners > (self.squares_x - 1) * (self.squares_y - 1):
+            raise ValueError('min_corners 不能超过棋盘内部角点总数')
+        return self
 
 
 # =====================================================
@@ -202,8 +210,26 @@ class AppSettings(BaseModel):
     # 离线配置
     offline: OfflineSettings = OfflineSettings()
 
-    # Charuco 标定配置
+    # 旧版兼容入口；新流程分别使用下面两套配置。
     charuco: CharucoSettings = CharucoSettings()
+    handeye_charuco: CharucoSettings = Field(default_factory=CharucoSettings)
+    station_charuco: CharucoSettings = Field(default_factory=CharucoSettings)
+
+    @model_validator(mode='before')
+    @classmethod
+    def resolve_charuco_profiles(cls, data):
+        """仅当新配置块缺失时回退到旧 charuco；显式配置必须完整独立。"""
+        if isinstance(data, dict):
+            data = dict(data)
+            legacy = data.get('charuco')
+            if legacy is not None:
+                for name in ('handeye_charuco', 'station_charuco'):
+                    if name not in data:
+                        data[name] = (
+                            legacy.model_dump() if isinstance(legacy, CharucoSettings)
+                            else dict(legacy) if isinstance(legacy, dict) else legacy
+                        )
+        return data
 
     # Aruco 定位配置
     aruco: ArucoSettings = ArucoSettings()

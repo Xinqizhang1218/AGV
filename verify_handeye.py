@@ -31,7 +31,7 @@ from agv_vision.vision.charuco_detector import CharucoBoardDetector
 from agv_vision.vision.handeye_calibrator import PlanarHandEyeCalibrator
 
 
-ROOT = Path(r'D:\code\AGV\pkg3_260522')
+ROOT = Path(__file__).resolve().parent
 EXAMPLE_DIR = ROOT / 'examples'
 POSE_DIR = EXAMPLE_DIR / '拍照位姿'
 DEFAULT_REQUEST = POSE_DIR / 't_pose_eye_hand_request.json'
@@ -65,7 +65,7 @@ def run(request_json: Path, out_dir: Path) -> int:
 
     settings = AppSettings.from_yaml(ROOT / 'agv_vision' / 'config' / 'settings.yaml')
     setup_logging(str(ROOT / 'logs'))
-    detector = CharucoBoardDetector(settings.charuco)
+    detector = CharucoBoardDetector(settings.handeye_charuco)
     calibrator = PlanarHandEyeCalibrator()
 
     image_point_list = request['imagePointList']

@@ -16,7 +16,21 @@ offline:
     - '.png'
     - '.bmp'
 
-charuco:
+# 手眼采样与标定专用；长度单位：米。
+handeye_charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  square_length_m: 0.020
+  marker_length_m: 0.012
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+
+# 工位基准与二次补偿专用；更换板规格后必须重新采集工位基准。
+station_charuco:
   dictionary_name: DICT_4X4_50
   squares_x: 5
   squares_y: 5

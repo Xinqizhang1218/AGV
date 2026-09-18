@@ -91,7 +91,7 @@ aruco:
 # 来源：标定版目录内三份 CHARUCO_DICT_4X4 铝板 V1 图纸（2026/09/04）。
 # 长度单位为米；squares_x/y 是格子数，不是内角点数。
 # 图纸仅注明 DICT_4X4，以下沿用当前 DICT_4X4_50，启用前需核对字典及 ID 排列。
-# 检测参数沿用当前配置；切换时仅用其中一组替换下方生效的 charuco 配置。
+# 检测参数沿用当前配置；将备选参数填入对应的新配置块，勿直接取消 charuco 注释。
 #
 # 方案一：50x50x3 mm 铝板，图案 40x40 mm，格子 8 mm，标记 5.333 mm。
 # 来源文件：CHARUCO_DICT_4X4铝板-50x50x3mm-8-V1.pdf
@@ -135,7 +135,21 @@ aruco:
 #   max_marker_perimeter_rate: 4.0
 #   use_subpix: true
 # =====================================================
-charuco:
+# 手眼采样与标定专用；长度单位：米。
+handeye_charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  square_length_m: 0.030
+  marker_length_m: 0.021
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+
+# 工位基准与二次补偿专用；更换板规格后必须重新采集工位基准。
+station_charuco:
   dictionary_name: DICT_4X4_50
   squares_x: 5
   squares_y: 5

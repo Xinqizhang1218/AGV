@@ -521,9 +521,9 @@ def _normalize_charuco_corners(reference: dict) -> list[dict[str, float | int]] 
             field_name = 'corners'
     if raw_corners is None:
         return None
-    if not isinstance(raw_corners, list) or len(raw_corners) < settings.charuco.min_corners:
+    if not isinstance(raw_corners, list) or len(raw_corners) < settings.station_charuco.min_corners:
         raise ValueError(
-            f'data.reference.{field_name} 至少需要 {settings.charuco.min_corners} 个角点'
+            f'data.reference.{field_name} 至少需要 {settings.station_charuco.min_corners} 个角点'
         )
 
     corners: list[dict[str, float | int]] = []
@@ -583,7 +583,7 @@ def _normalize_reference_payload(data: dict) -> dict:
             'board_center_y': center_y,
             'board_angle_deg': 0.0,
             'marker_count': 0,
-            'marker_length_m': float(settings.charuco.marker_length_m),
+            'marker_length_m': float(settings.station_charuco.marker_length_m),
             'preferred_origin_id': marker_id,
             'marker_pixel_length_px': None,
             'pixels_per_m': None,
