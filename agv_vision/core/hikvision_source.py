@@ -129,11 +129,15 @@ class HikvisionColorSource(BaseFrameSource):
                 self._set("MV_CC_SetFloatValue", "Gain", float(self.gain))
             self._set("MV_CC_SetEnumValue", "BalanceWhiteAuto", 1 if self.auto_white_balance else 0)
 
-            value_type = getattr(self.sdk, "MVCC_INTVALUE_EX", None)
-            value_type = value_type or getattr(self.sdk, "MVCC_INTVALUE")
+            # Ex 接口与64位结构体必须成对，不能交给旧版32位接口。
+            use_ex = (hasattr(self.sdk, "MVCC_INTVALUE_EX")
+                      and hasattr(self.camera, "MV_CC_GetIntValueEx"))
+            value_type = self.sdk.MVCC_INTVALUE_EX if use_ex else self.sdk.MVCC_INTVALUE
+            getter = self.camera.MV_CC_GetIntValueEx if use_ex else self.camera.MV_CC_GetIntValue
             value = value_type()
-            self._check(self.camera.MV_CC_GetIntValue("PayloadSize", value), "读取海康 PayloadSize")
+            self._check(getter("PayloadSize", value), "读取海康 PayloadSize")
             self.payload_size = int(value.nCurValue)
+            self._validate_payload_size()
             self._check(self.camera.MV_CC_StartGrabbing(), "启动海康取流")
             self.grabbing = True
         except SourceError:
@@ -143,9 +147,15 @@ class HikvisionColorSource(BaseFrameSource):
             self.close()
             raise SourceError(f"打开海康相机失败: {exc}") from exc
 
+    def _validate_payload_size(self) -> None:
+        # 本图像源仅处理彩色/灰度帧，拒绝异常SDK值及不合理的大块分配。
+        if not 0 < self.payload_size <= 512 * 1024 * 1024:
+            raise SourceError(f"海康 PayloadSize 异常: {self.payload_size}，拒绝分配图像缓冲区")
+
     def grab(self) -> FrameBundle:
         if self.camera is None or not self.grabbing:
             raise SourceError("海康图像源尚未打开")
+        self._validate_payload_size()
         info = self.sdk.MV_FRAME_OUT_INFO_EX()
         ctypes.memset(ctypes.byref(info), 0, ctypes.sizeof(info))
         raw = (ctypes.c_ubyte * self.payload_size)()
@@ -163,6 +173,8 @@ class HikvisionColorSource(BaseFrameSource):
     def _to_bgr(self, raw: Any, info: Any):
         width, height = int(info.nWidth), int(info.nHeight)
         pixel_type, length = int(info.enPixelType), int(info.nFrameLen)
+        if width <= 0 or height <= 0 or not 0 < length <= len(raw):
+            raise SourceError(f"海康帧尺寸或长度异常: {width}x{height}, frame={length}, buffer={len(raw)}")
         source = np.ctypeslib.as_array(raw)[:length]
         if pixel_type == getattr(self.sdk, "PixelType_Gvsp_Mono8", -1):
             return cv2.cvtColor(source.reshape(height, width), cv2.COLOR_GRAY2BGR)
@@ -172,11 +184,15 @@ class HikvisionColorSource(BaseFrameSource):
             return source.reshape(height, width, 3).copy()
 
         target = getattr(self.sdk, "PixelType_Gvsp_BGR8_Packed", None)
-        convert_type = getattr(self.sdk, "MV_CC_PIXEL_CONVERT_PARAM_EX", None)
-        convert_type = convert_type or getattr(self.sdk, "MV_CC_PIXEL_CONVERT_PARAM", None)
+        use_ex = (hasattr(self.sdk, "MV_CC_PIXEL_CONVERT_PARAM_EX")
+                  and hasattr(self.camera, "MV_CC_ConvertPixelTypeEx"))
+        convert_type = getattr(self.sdk, "MV_CC_PIXEL_CONVERT_PARAM_EX" if use_ex
+                               else "MV_CC_PIXEL_CONVERT_PARAM", None)
         if target is None or convert_type is None:
             raise SourceError(f"海康图像像素格式不受支持: 0x{pixel_type:08X}")
         output_size = width * height * 3
+        if output_size > 512 * 1024 * 1024:
+            raise SourceError(f"海康帧尺寸异常，转换缓冲区过大: {width}x{height}")
         output = (ctypes.c_ubyte * output_size)()
         param = convert_type()
         ctypes.memset(ctypes.byref(param), 0, ctypes.sizeof(param))
@@ -186,8 +202,11 @@ class HikvisionColorSource(BaseFrameSource):
         param.enDstPixelType = target
         param.pDstBuffer = ctypes.cast(output, ctypes.POINTER(ctypes.c_ubyte))
         param.nDstBufferSize = output_size
-        self._check(self.camera.MV_CC_ConvertPixelType(param), "转换海康图像像素格式")
+        converter = self.camera.MV_CC_ConvertPixelTypeEx if use_ex else self.camera.MV_CC_ConvertPixelType
+        self._check(converter(param), "转换海康图像像素格式")
         output_length = int(getattr(param, "nDstLen", output_size))
+        if output_length != output_size:
+            raise SourceError(f"海康转换输出长度异常: {output_length}，预期 {output_size}")
         return np.ctypeslib.as_array(output)[:output_length].reshape(height, width, 3).copy()
 
     def close(self) -> None:
