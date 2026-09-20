@@ -30,6 +30,8 @@
 
    python auto_cross_machine_calibration.py run ^
      --profile cross_machine_station_001.json ^
+     --confirm-same-camera ^
+     --rounds 5 ^
      --confirm-single-pose-task ^
      --execute
 
@@ -47,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import hashlib
 import json
 import math
 import struct
@@ -287,7 +290,8 @@ def resolve_delta_target_pose(
     ]
 
     for index in range(3, 6):
-        target[index] = normalize_angle_rad(target[index])
+        # 保留最接近当前机器人读数的角度分支，避免 -pi 附近跳到 +pi。
+        target[index] = current[index] + normalize_angle_rad(response[index]) * damping
     return validate_pose(target, "target_pose")
 
 
@@ -1338,6 +1342,8 @@ def request_and_verify_compensation(
         "candidate_target_pose": result.target_pose,
         "residual_position_m": result.residual_position_m,
         "residual_orientation_deg": result.residual_orientation_deg,
+        "residual_xyz_mm": [value * 1000.0 for value in result.response_pose[:3]],
+        "residual_xy_mm": math.hypot(*result.response_pose[:2]) * 1000.0,
         "passed": is_converged(result, profile.convergence),
         "task_id": result.task_id,
         "image_path": result.image_path,
@@ -1479,6 +1485,110 @@ def collect_reference(args: argparse.Namespace) -> int:
             robot.close()
 
 
+def build_trial_targets(profile: CalibrationProfile, offsets: list) -> list[list[float]]:
+    """显式偏移是基坐标 XYZ 和当前欧拉角分量增量，单位 m/rad。"""
+    if not isinstance(offsets, list) or not offsets:
+        raise ValueError("offsets 必须是非空六轴偏移列表")
+    targets = []
+    for index, offset in enumerate(offsets):
+        delta = validate_pose(offset, f"offsets[{index}]")
+        target = resolve_delta_target_pose(profile.observation_pose, delta, 1.0)
+        validate_candidate_target(target, profile.observation_pose,
+                                  profile.observation_pose, profile.safety)
+        targets.append(target)
+    return targets
+
+
+def summarize_trials(trials: list[dict], planned_count: int) -> dict:
+    """每个独立轮次只取一次阶段观测，原地复拍不增加样本数。"""
+    summary = {
+        "planned_count": planned_count,
+        "completed_count": sum(t["status"] in ("VISUAL_PASS", "FAIL_NOT_CONVERGED") for t in trials),
+        "passed_count": sum(t["status"] == "VISUAL_PASS" for t in trials),
+        "not_converged_count": sum(t["status"] == "FAIL_NOT_CONVERGED" for t in trials),
+        "aborted_count": sum(t["status"] == "ABORTED" for t in trials),
+    }
+    summary["pass_rate_of_planned"] = summary["passed_count"] / planned_count
+    for stage in ("initial", "after_first_correction", "final"):
+        records = [t[stage] for t in trials if t.get(stage) is not None]
+        metrics = {}
+        for name, values in {
+            "x_mm": [r["residual_xyz_mm"][0] for r in records],
+            "y_mm": [r["residual_xyz_mm"][1] for r in records],
+            "z_mm": [r["residual_xyz_mm"][2] for r in records],
+            "xy_mm": [r["residual_xy_mm"] for r in records],
+            "xyz_mm": [r["residual_position_m"] * 1000 for r in records],
+            "rotation_deg": [r["residual_orientation_deg"] for r in records],
+        }.items():
+            array = np.asarray(values, dtype=float)
+            metrics[name] = None if not values else {
+                "rms": float(np.sqrt(np.mean(array ** 2))),
+                "p95_abs": float(np.percentile(np.abs(array), 95)),
+                "max_abs": float(np.max(np.abs(array))),
+            }
+        summary[stage] = {"sample_count": len(records), "metrics": metrics}
+    return summary
+
+
+def execute_validation_trials(profile, robot, vision, targets, run_id, report, report_path):
+    sequence = 0
+    for trial_index, initial_target in enumerate(targets):
+        trial = {"trial_index": trial_index + 1, "status": "RUNNING",
+                 "initial_target_pose": initial_target, "observations": [],
+                 "initial": None, "after_first_correction": None, "final": None,
+                 "correction_count": 0}
+        report["trials"].append(trial)
+        target_pose = list(initial_target)
+        write_json(report_path, report)
+        for correction_index in range(profile.convergence.max_corrections + 1):
+            cycle_name = f"T{trial_index + 1:03d}_C{correction_index:02d}"
+            _, return_pose = robot.move_and_hold(cycle_name, target_pose)
+
+            def observe(label):
+                nonlocal sequence
+                result, record = request_and_verify_compensation(
+                    profile, robot, vision, target_pose, run_id, sequence, label)
+                sequence += 1
+                record["trial_index"] = trial_index + 1
+                record["correction_count"] = correction_index
+                trial["observations"].append(record)
+                report["observations"].append(record)
+                write_json(report_path, report)
+                return result, record
+
+            result, record = observe(cycle_name)
+            trial["correction_count"] = correction_index
+            if correction_index == 0:
+                trial["initial"] = record
+            elif correction_index == 1:
+                trial["after_first_correction"] = record
+            consecutive_passes = int(is_converged(result, profile.convergence))
+            while 0 < consecutive_passes < profile.convergence.required_consecutive_passes:
+                time.sleep(profile.convergence.verification_interval_seconds)
+                result, record = observe(f"{cycle_name}_verify_{consecutive_passes}")
+                consecutive_passes = consecutive_passes + 1 if is_converged(result, profile.convergence) else 0
+            passed = consecutive_passes >= profile.convergence.required_consecutive_passes
+            finished = passed or correction_index == profile.convergence.max_corrections
+            if not finished:
+                validate_candidate_target(result.target_pose, record["actual_pose_before"],
+                                          profile.observation_pose, profile.safety)
+            robot.release_and_wait_return(cycle_name, return_pose)
+            if finished:
+                trial["status"] = "VISUAL_PASS" if passed else "FAIL_NOT_CONVERGED"
+                trial["final"] = record
+                trial["final_target_pose"] = target_pose
+                report["summary"] = summarize_trials(report["trials"], len(targets))
+                write_json(report_path, report)
+                break
+            target_pose = result.target_pose
+    all_passed = all(t["status"] == "VISUAL_PASS" for t in report["trials"])
+    report["status"] = "VISUAL_PASS" if all_passed else "FAIL_NOT_CONVERGED"
+    report["finished_at"] = datetime.now().isoformat(timespec="seconds")
+    write_json(report_path, report)
+    print(f"[SYSTEM] 视觉闭环验证：{report['status']}；不代表独立测量精度。报告：{report_path}")
+    return 0 if all_passed else 1
+
+
 def run_automatic_calibration(args: argparse.Namespace) -> int:
     if not args.execute:
         raise ValueError(
@@ -1491,11 +1601,21 @@ def run_automatic_calibration(args: argparse.Namespace) -> int:
         )
     profile_path = Path(args.profile).expanduser().resolve()
     profile = load_profile(profile_path)
+    if not args.confirm_same_camera:
+        raise ValueError("需传 --confirm-same-camera，确认基准和当前图来自同一套机器人/相机/镜头/分辨率/安装及标定板规格；不同设备不支持")
+    if args.rounds < 1:
+        raise ValueError("--rounds 必须至少为 1")
     profile.motion.start_task_single_pose_confirmed = True
     if args.handeye_json:
-        profile.handeye = extract_handeye_document(
+        replacement = extract_handeye_document(
             read_json(Path(args.handeye_json).expanduser().resolve())
         )
+        for key in ("cameraMatrix", "distCoeffs", "gTc"):
+            old = np.asarray(profile.handeye["pose3d"][key], dtype=float)
+            new = np.asarray(replacement["pose3d"][key], dtype=float)
+            if old.shape != new.shape or not np.array_equal(old, new):
+                raise ValueError(f"{key} 与基准不一致，请使用新标定重新采集基准")
+        profile.handeye = replacement
     if args.plc_ip:
         profile.motion.plc_ip = args.plc_ip
     if args.plc_port is not None:
@@ -1504,7 +1624,9 @@ def run_automatic_calibration(args: argparse.Namespace) -> int:
         profile.vision_base_url = args.vision_url
     validate_profile(profile)
 
-    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    offsets = read_json(Path(args.offsets_json))["offsets"] if args.offsets_json else [[0.0] * 6]
+    targets = build_trial_targets(profile, offsets) * args.rounds
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     report_path = (
         Path(args.report).expanduser().resolve()
         if args.report
@@ -1515,7 +1637,14 @@ def run_automatic_calibration(args: argparse.Namespace) -> int:
         / "calibration_report.json"
     )
     report: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "validation_scope": "visual_closed_loop_only",
+        "independent_accuracy_verified": False,
+        "effective_profile": profile_to_dict(profile),
+        "source_profile_sha256": hashlib.sha256(profile_path.read_bytes()).hexdigest(),
+        "reference_capture": read_json(profile_path).get("reference_capture"),
+        "planned_initial_targets": targets,
+        "trials": [],
         "run_id": run_id,
         "station_id": profile.station_id,
         "profile_path": str(profile_path),
@@ -1529,143 +1658,17 @@ def run_automatic_calibration(args: argparse.Namespace) -> int:
 
     robot = RobotPLC(profile.motion, profile.safety)
     vision = VisionClient(profile.vision_base_url)
-    target_pose = list(profile.observation_pose)
-    sequence = 0
     try:
-        vision.health_check()
+        report["vision_health"] = vision.health_check()
+        write_json(report_path, report)
         robot.connect()
-        print("=" * 78)
-        print("跨机台自动补偿启动")
-        print(f"机台：{profile.station_id}")
-        print(f"名义观察位姿：{profile.observation_pose}")
-        print(
-            "收敛阈值："
-            f"{profile.convergence.max_residual_position_m * 1000.0:.3f}mm, "
-            f"{profile.convergence.max_residual_orientation_deg:.3f}deg"
-        )
-        print(
-            f"最多补偿 {profile.convergence.max_corrections} 次，"
-            f"连续复拍 {profile.convergence.required_consecutive_passes} "
-            "次合格才通过"
-        )
-        print("=" * 78)
-
-        for correction_index in range(
-            profile.convergence.max_corrections + 1
-        ):
-            cycle_name = f"C{correction_index:02d}"
-            print(
-                f"\n[SYSTEM] 第 {correction_index + 1} 轮，"
-                f"下发目标：{target_pose}"
-            )
-            _, return_pose = robot.move_and_hold(cycle_name, target_pose)
-            result, record = request_and_verify_compensation(
-                profile=profile,
-                robot=robot,
-                vision=vision,
-                target_pose=target_pose,
-                run_id=run_id,
-                sequence=sequence,
-                label=f"correction_{correction_index:02d}",
-            )
-            sequence += 1
-            report["observations"].append(record)
-
-            consecutive_passes = 1 if is_converged(
-                result, profile.convergence
-            ) else 0
-            while (
-                consecutive_passes > 0
-                and consecutive_passes
-                < profile.convergence.required_consecutive_passes
-            ):
-                time.sleep(
-                    profile.convergence.verification_interval_seconds
-                )
-                confirm_result, confirm_record = (
-                    request_and_verify_compensation(
-                        profile=profile,
-                        robot=robot,
-                        vision=vision,
-                        target_pose=target_pose,
-                        run_id=run_id,
-                        sequence=sequence,
-                        label=(
-                            f"verify_{correction_index:02d}_"
-                            f"{consecutive_passes:02d}"
-                        ),
-                    )
-                )
-                sequence += 1
-                report["observations"].append(confirm_record)
-                result = confirm_result
-                record = confirm_record
-                if is_converged(result, profile.convergence):
-                    consecutive_passes += 1
-                else:
-                    consecutive_passes = 0
-
-            if (
-                consecutive_passes
-                >= profile.convergence.required_consecutive_passes
-            ):
-                robot.release_and_wait_return(cycle_name, return_pose)
-                report["status"] = "PASS"
-                report["final_target_pose"] = target_pose
-                report["final_residual_position_m"] = (
-                    result.residual_position_m
-                )
-                report["final_residual_orientation_deg"] = (
-                    result.residual_orientation_deg
-                )
-                report["correction_count"] = correction_index
-                report["finished_at"] = datetime.now().isoformat(
-                    timespec="seconds"
-                )
-                write_json(report_path, report)
-                print(
-                    "\n[SYSTEM] 跨机台自动补偿通过："
-                    f"{result.residual_position_m * 1000.0:.3f}mm, "
-                    f"{result.residual_orientation_deg:.3f}deg"
-                )
-                print(f"[SYSTEM] 报告：{report_path.resolve()}")
-                return 0
-
-            if correction_index >= profile.convergence.max_corrections:
-                robot.release_and_wait_return(cycle_name, return_pose)
-                report["status"] = "FAIL_NOT_CONVERGED"
-                report["final_target_pose"] = target_pose
-                report["final_residual_position_m"] = (
-                    result.residual_position_m
-                )
-                report["final_residual_orientation_deg"] = (
-                    result.residual_orientation_deg
-                )
-                report["correction_count"] = correction_index
-                report["finished_at"] = datetime.now().isoformat(
-                    timespec="seconds"
-                )
-                write_json(report_path, report)
-                print(
-                    "\n[SYSTEM] 已达到最大补偿次数，残差仍超限："
-                    f"{result.residual_position_m * 1000.0:.3f}mm, "
-                    f"{result.residual_orientation_deg:.3f}deg"
-                )
-                print(f"[SYSTEM] 报告：{report_path.resolve()}")
-                return 1
-
-            validate_candidate_target(
-                candidate_pose=result.target_pose,
-                current_pose=record["actual_pose_before"],
-                observation_pose=profile.observation_pose,
-                safety=profile.safety,
-            )
-            target_pose = result.target_pose
-            robot.release_and_wait_return(cycle_name, return_pose)
-
-        raise AssertionError("自动补偿循环意外结束")
+        return execute_validation_trials(
+            profile, robot, vision, targets, run_id, report, report_path)
     except BaseException as exc:
         report["status"] = "ABORTED"
+        if report["trials"] and report["trials"][-1]["status"] == "RUNNING":
+            report["trials"][-1]["status"] = "ABORTED"
+        report["summary"] = summarize_trials(report["trials"], len(targets))
         report["error"] = f"{type(exc).__name__}: {exc}"
         report["finished_at"] = datetime.now().isoformat(timespec="seconds")
         write_json(report_path, report)
@@ -1821,10 +1824,16 @@ def build_argument_parser() -> argparse.ArgumentParser:
         help="执行自动拍照、补偿、移动、复拍和残差验收",
     )
     run_parser.add_argument("--profile", required=True)
+    run_parser.add_argument("--rounds", type=int, default=1,
+                            help="每个偏移独立重复次数，默认 1")
+    run_parser.add_argument("--offsets-json", default=None,
+                            help='JSON: {"offsets": [[dx,dy,dz,drx,dry,drz], ...]}，m/rad')
+    run_parser.add_argument("--confirm-same-camera", action="store_true",
+                            help="确认同一套机器人、相机、镜头、分辨率、安装和标定板规格")
     run_parser.add_argument(
         "--handeye-json",
         default=None,
-        help="可选：用目标机台自己的手眼标定结果覆盖配置内 handeye",
+        help="可选：核验手眼文件，几何参数必须与基准一致",
     )
     run_parser.add_argument("--plc-ip", default=None)
     run_parser.add_argument("--plc-port", type=int, default=None)
