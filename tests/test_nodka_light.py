@@ -105,6 +105,21 @@ class NodkaLightTests(unittest.TestCase):
         other.close()
         self.light.turn_on()
 
+    def test_identity_mismatch_reports_values_without_switch_commands(self):
+        original_open = self.bridge.agv_light_open
+
+        def mismatched_open(port, pointer):
+            original_open(port, pointer)
+            pointer._obj.port = 3
+            pointer._obj.device = 0
+
+        self.bridge.agv_light_open = mismatched_open
+        with self.assertRaisesRegex(
+                SourceError, 'requested_port=2, returned_port=3, expected_device=1, returned_device=0'):
+            self.light.open()
+        self.assertNotIn('set', self.bridge.events)
+        self.assertEqual(self.bridge.events[-2:], ['close', 'deinit'])
+
     def test_cleanup_still_deinitializes_after_off_error(self):
         self.light.open()
         self.bridge.fail = 'set_error'

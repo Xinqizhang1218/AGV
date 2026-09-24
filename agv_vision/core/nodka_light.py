@@ -46,6 +46,7 @@ class NodkaLight:
         self._library = None
         self._initialized = False
         self._port_attempted = False
+        self._device_verified = False
         self._owns_library = False
         self._lock = threading.RLock()
 
@@ -98,7 +99,12 @@ class NodkaLight:
                 self._port_attempted = True
                 result = self._command("agv_light_open", self.port)
                 if result.port != self.port or result.device != 1:
-                    raise SourceError("NKLC open callback returned unexpected port/device")
+                    raise SourceError(
+                        f"NKLC open callback mismatch: requested_port={self.port}, "
+                        f"returned_port={result.port}, expected_device=1, "
+                        f"returned_device={result.device}, sdk_return={result.sdk_return}"
+                    )
+                self._device_verified = True
                 self.turn_off()
             except BaseException:
                 try:
@@ -109,7 +115,7 @@ class NodkaLight:
 
     def _set_switch(self, is_on: bool) -> None:
         with self._lock:
-            if not self._initialized or not self._port_attempted:
+            if not self._initialized or not self._device_verified:
                 raise SourceError("NKLC controller is not open")
             result = self._command("agv_light_set", 1, self.channel_mask,
                                    self.brightness, int(is_on))
@@ -131,8 +137,10 @@ class NodkaLight:
             errors = []
             try:
                 if self._initialized and self._port_attempted:
-                    for action in (self.turn_off,
-                                   lambda: self._command("agv_light_close", self.port)):
+                    actions = [lambda: self._command("agv_light_close", self.port)]
+                    if self._device_verified:
+                        actions.insert(0, self.turn_off)
+                    for action in actions:
                         try:
                             action()
                         except Exception as exc:
@@ -144,6 +152,7 @@ class NodkaLight:
             finally:
                 self._initialized = False
                 self._port_attempted = False
+                self._device_verified = False
                 if self._owns_library:
                     self._owns_library = False
                     self._owner_lock.release()
