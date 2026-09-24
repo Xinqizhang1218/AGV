@@ -33,7 +33,7 @@ camera:
 
   hikvision:
     installer_path: null
-    python_path: "SDK/MvImport"  # 从项目根目录启动；Linux 仍需安装 MVS 运行库。
+    python_path: "SDK/MvImport"  # 对应 pkg5_260728/SDK/MvImport；在项目根目录启动，Linux 另需 MVS 运行库。
     serial_number: null
     ip_address: null
     width: 1280
@@ -48,7 +48,7 @@ camera:
 
   enable_depth: false      # 是否开启深度图（双目深度相机可用）
 
-  timeout_ms: 5000         # USB相机首帧可能较慢；超时后代码会自动重连一次
+  timeout_ms: 5000         # 单次取图超时（毫秒）；光源拍照失败后需检查并重启，不自动重拍。
 
   prefer_format: MJPG      # 图像格式（MJPG压缩格式）
 
@@ -60,9 +60,9 @@ camera:
 
   serial_number: null        # 当前 USB Orbbec Gemini 305 序列号
 
-  auto_exposure: false      # 自动曝光
+  auto_exposure: false      # 光源联动拍照使用固定曝光，必须关闭自动曝光。
 
-  exposure: 10000            # 手动曝光值（关闭自动曝光时生效）
+  exposure: 10000            # 海康单位微秒，10000 = 10 毫秒；按实拍亮度调整。
 
   gain: null               # 增益值（提高亮度但会增加噪点）
 
@@ -274,6 +274,6 @@ light:
   config_path: third_party/nodka/config/nkio_config.ini
   port: 3  # NP-6133-MVS 实机已验证
   channel_mask: 1  # 机箱 CH1 = SDK CH0 = 0x01，实机已确认亮灯
-  brightness: 50
-  settle_ms: 100
+  brightness: 50  # 0～100；机箱 CH1 已实测此亮度能亮灯。
+  settle_ms: 100  # 开灯后等待毫秒数；每张图取完关灯，手眼整组常亮尚未实现。
 
