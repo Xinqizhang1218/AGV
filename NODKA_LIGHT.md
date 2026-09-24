@@ -1,14 +1,47 @@
 # Nodka 光源控制（NKIOSDK Linux V5.0.4）
 
 已提供 Python 控制类、独立开灯命令，以及 AGVVisionService 拍照接入。
-默认禁用；未填写设备参数时不会操作光源。硬件只在 `open()` 时连接。
+配置模型默认禁用；本项目在线 YAML 已按实机参数启用。硬件只在 `open()` 时连接。
+
+## 本次实机结论与部署
+
+2026-09-24：openEuler 24.03 x86_64 上已使用 GCC_11.04 原厂库编译桥接库，
+动态依赖检查通过；NP-6133-MVS、SDK 端口 3、掩码 0x01、亮度 50 的开关灯
+已由用户确认实际亮灭。机箱印字 CH1 对应 SDK CH0，不是 SDK CH1/0x02。
+海康曝光与光源联合拍照尚待现场验证。
+
+停止正在占用相机/光源的视觉进程，备份旧文件后，将部署包中的 `agv_vision`
+目录合并到 `/home/projects/vision/pkg5-vision/pkg5_vision`，覆盖包内四个同名 Python 文件。
+部署包不包含整份在线 YAML，避免覆盖现场 IP、内参和标定板配置。
+把 `deploy/nodka_np6133_mvs.yaml` 的 light 块合并到现有在线 YAML（已有 light 块就替换），
+并核对已有 camera.vendor=hikvision、auto_exposure=false、exposure=10000，
+以及 camera.hikvision.python_path=SDK/MvImport。
+保留工控机上已验证的 `third_party/nodka/lib` 和 `config`；本次无需重新编译。
+
+在项目根目录，使用原视觉服务的 Python 环境，先进行一次单张拍照：
+
+```bash
+cd /home/projects/vision/pkg5-vision/pkg5_vision
+python3 -m agv_vision.main --config agv_vision/config/settings_online.yaml capture
+```
+
+检查图像路径、图片亮度/清晰度及灯在曝光后熄灭。
+光源亮起时间约为稳定等待加曝光/取图耗时，不再固定亮 3 秒。
+成功后按原方式重启服务；如原来直接启动，可用：
+
+```bash
+python3 -m agv_vision.main --config agv_vision/config/settings_online.yaml serve
+```
+
+独立采图成功不能替代 API 拍照验收；再通过原后端拍照入口验证一次。
+Docker 部署需保证容器能访问已验证串口和动态库，不能以宿主机测试代替容器测试。
 
 ## 接线与适用范围
 
 - 面向 SDK 支持的 Nodka 光源控制器/内置光源接口，使用 NKLC 软件开关模式 0。
 - 如果灯实际接在普通 DO 或外置控制器上，不适用本模块。
 - 确认工控机/板卡型号、Linux 架构、实际串口、灯路，再选 SDK 配置文件。
-- `channel_mask` 只允许单路：CH0=1、CH1=2、CH2=4、CH3=8。
+- `channel_mask` 只允许单路，SDK 编号 CH0=1、CH1=2、CH2=4、CH3=8；不要与机箱印字混用。
 - 亮度为 0～100；`settle_ms` 为毫秒，100 只是可调整的起始值。
 - 手册写 COM3 在 Linux 映射 `/dev/ttyS2`、参数填 2；部分示例/INI 写 3。
   **必须在目标机器确认，不能照抄 2 或 3，也不能只按 Windows COM 编号填写。**
@@ -50,14 +83,14 @@ SDK 二进制和实机 INI 被 Git 忽略，需单独部署。
 
 ## 独立 Python 开灯
 
-下面仅举例：假设已经确认 Linux SDK 端口为 2，光源接 CH0。
+下面使用本机已验证参数：SDK 端口 3，机箱 CH1（SDK CH0）。
 在项目根目录、项目 Python 环境下运行：
 
 ```bash
 python -m agv_vision.core.nodka_light \
   --library third_party/nodka/lib/libagv_nodka_light.so \
   --config third_party/nodka/config/nkio_config.ini \
-  --port 2 --channel-mask 0x01 --brightness 50 --seconds 3
+  --port 3 --channel-mask 0x01 --brightness 50 --seconds 3
 ```
 
 行为：初始化 → 连接 → 确认关灯 → 开灯并读回 → 保持 3 秒 → 关灯并释放。
@@ -73,8 +106,8 @@ from agv_vision.core.nodka_light import NodkaLight
 light = NodkaLight(
     library_path='third_party/nodka/lib/libagv_nodka_light.so',
     config_path='third_party/nodka/config/nkio_config.ini',
-    port=2,             # 替换为实机确认值
-    channel_mask=0x01, # 替换为实际接线通道
+    port=3,             # NP-6133-MVS 实机已验证
+    channel_mask=0x01, # 本机机箱 CH1
     brightness=50,
 )
 try:
@@ -91,7 +124,7 @@ CLI 的 `--seconds` 是 Python 计时，不修改控制器保持时间单位。
 
 ## 接入服务拍照
 
-把 `config_examples/nodka_light.yaml` 的 `light` 块合并进实际启动使用的 YAML。
+把 `deploy/nodka_np6133_mvs.yaml` 的 `light` 块合并进实际启动使用的 YAML。
 确认硬件后填写 `port`、`channel_mask`，将 `enabled` 改为 true。
 同一 YAML 的相机配置要求：
 

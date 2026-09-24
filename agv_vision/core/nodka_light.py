@@ -184,6 +184,10 @@ class IlluminatedFrameSource:
             try:
                 self.source.open()
                 self._faulted = False
+                logging.getLogger(__name__).info(
+                    "光源拍照就绪 port=%s channel_mask=0x%02X brightness=%s settle_ms=%s",
+                    self.light.port, self.light.channel_mask, self.light.brightness, self.settle_ms,
+                )
             except BaseException:
                 try:
                     self.light.close()
@@ -197,6 +201,7 @@ class IlluminatedFrameSource:
                 raise SourceError("Light capture faulted; close and reopen after checking hardware")
             try:
                 self.light.turn_on()
+                logging.getLogger(__name__).info("光源开灯读回确认，等待稳定后触发拍照")
                 time.sleep(self.settle_ms / 1000.0)
                 frame = self.source.grab()
             except BaseException:
@@ -208,6 +213,7 @@ class IlluminatedFrameSource:
                 raise
             try:
                 self.light.turn_off()  # Off failure must not be reported as success.
+                logging.getLogger(__name__).info("图像已获取，光源关灯读回确认")
             except BaseException:
                 self._faulted = True
                 raise

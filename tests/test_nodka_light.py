@@ -163,7 +163,8 @@ class CaptureTests(unittest.TestCase):
             return run
 
         light = SimpleNamespace(turn_on=action('on'), turn_off=action('off'),
-                                open=action('light_open'), close=action('light_close'))
+                                open=action('light_open'), close=action('light_close'),
+                                port=3, channel_mask=1, brightness=50)
         camera = SimpleNamespace(grab=action('grab'), open=action('camera_open'),
                                  close=action('camera_close'))
         return IlluminatedFrameSource(camera, light, 0), events
@@ -172,6 +173,14 @@ class CaptureTests(unittest.TestCase):
         source, events = self.make_source()
         self.assertEqual(source.grab(), 'frame')
         self.assertEqual(events, ['on', 'grab', 'off'])
+
+    def test_open_capture_close_lifecycle(self):
+        source, events = self.make_source()
+        source.open()
+        self.assertEqual(source.grab(), 'frame')
+        source.close()
+        self.assertEqual(events, ['light_open', 'camera_open', 'on', 'grab', 'off',
+                                  'light_close', 'camera_close'])
 
     def test_failures_always_attempt_off_and_block_next_capture(self):
         for failure, expected in [('on', ['on', 'off']), ('grab', ['on', 'grab', 'off']),

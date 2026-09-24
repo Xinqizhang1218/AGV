@@ -1,0 +1,12 @@
+# 合并到工控机现有 YAML 顶层；不要用此片段覆盖整个配置文件。
+# NP-6133-MVS 实机：机箱 CH1 对应 SDK CH0，位掩码 0x01。
+light:
+  enabled: true
+  library_path: third_party/nodka/lib/libagv_nodka_light.so
+  config_path: third_party/nodka/config/nkio_config.ini
+  port: 3
+  channel_mask: 1
+  brightness: 50
+  settle_ms: 100
+# 现有 camera 块要求 vendor: hikvision、auto_exposure: false、exposure: 10000。
+# hikvision.python_path: SDK/MvImport；IP/分辨率保留实机配置。

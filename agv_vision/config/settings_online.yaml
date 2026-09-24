@@ -12,7 +12,7 @@ mode: online
 camera:
 
   # 可选：orbbec / daheng / hikvision
-  vendor: orbbec
+  vendor: hikvision
 
   # 每个厂商使用自己的分辨率和帧率。
   orbbec:
@@ -267,4 +267,13 @@ service:
   host: 0.0.0.0                # 所有网卡可访问
 
   port: 8088                   # 服务端口，按后端接口文档默认心跳/服务端口
+
+light:
+  enabled: true
+  library_path: third_party/nodka/lib/libagv_nodka_light.so
+  config_path: third_party/nodka/config/nkio_config.ini
+  port: 3  # NP-6133-MVS 实机已验证
+  channel_mask: 1  # 机箱 CH1 = SDK CH0 = 0x01，实机已确认亮灯
+  brightness: 50
+  settle_ms: 100
 
