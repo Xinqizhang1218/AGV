@@ -17,6 +17,7 @@ from agv_vision.core.offline_source import OfflineImageSource  # 导入离线图
 from agv_vision.core.orbbec_source import OrbbecColorSource  # 导入奥比中光在线相机源
 from agv_vision.core.daheng_source import DahengColorSource
 from agv_vision.core.hikvision_source import HikvisionColorSource
+from agv_vision.core.nodka_light import NodkaLight, IlluminatedFrameSource
 from agv_vision.vision.charuco_detector import CharucoBoardDetector  # Charuco 检测器
 from agv_vision.vision.aruco_detector import ArucoReferenceDetector  # Aruco 检测器
 from agv_vision.vision.handeye_calibrator import PlanarHandEyeCalibrator  # 手眼标定器
@@ -28,6 +29,17 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         self.settings = settings  # 保存应用配置对象
         self.logger = logger  # 保存日志对象
         self.source = self._build_source()  # 根据模式构建图像源（在线或离线）
+        if settings.mode.lower() == 'online' and settings.light.enabled:
+            light_settings = settings.light
+            # AppSettings restricts this path to software-triggered Hikvision.
+            self.source.software_trigger = True
+            self.source = IlluminatedFrameSource(
+                self.source,
+                NodkaLight(light_settings.library_path, light_settings.config_path,
+                           light_settings.port, light_settings.channel_mask,
+                           light_settings.brightness),
+                light_settings.settle_ms,
+            )
         self.handeye_charuco_detector = CharucoBoardDetector(settings.handeye_charuco)
         self.station_charuco_detector = CharucoBoardDetector(settings.station_charuco)  # 初始化 Charuco 检测器
         self.aruco_detector = ArucoReferenceDetector(settings.aruco)  # 初始化 Aruco 检测器

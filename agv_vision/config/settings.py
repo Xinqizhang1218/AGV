@@ -196,6 +196,16 @@ class ServiceSettings(BaseModel):
 # =====================================================
 # 总配置类
 # =====================================================
+class LightSettings(BaseModel):
+    enabled: bool = False
+    library_path: str = 'third_party/nodka/lib/libagv_nodka_light.so'
+    config_path: str = 'third_party/nodka/config/nkio_config.ini'
+    port: int | None = Field(default=None, ge=0, le=65535)
+    channel_mask: Literal[1, 2, 4, 8] | None = None
+    brightness: int = Field(default=50, ge=0, le=100)
+    settle_ms: int = Field(default=100, ge=0, le=10000)
+
+
 class AppSettings(BaseModel):
 
     # 当前模式：offline / online
@@ -206,6 +216,18 @@ class AppSettings(BaseModel):
 
     # 相机配置
     camera: CameraSettings = CameraSettings()
+    light: LightSettings = Field(default_factory=LightSettings)
+
+    @model_validator(mode='after')
+    def validate_light_capture(self) -> 'AppSettings':
+        if self.light.enabled and self.mode.lower() == 'online':
+            if self.light.port is None or self.light.channel_mask is None:
+                raise ValueError('light.enabled requires explicit port and channel_mask')
+            if self.camera.vendor != 'hikvision':
+                raise ValueError('Light-controlled capture currently requires Hikvision software trigger')
+            if self.camera.auto_exposure or self.camera.exposure is None or self.camera.exposure <= 0:
+                raise ValueError('Light-controlled capture requires auto_exposure=false and positive exposure')
+        return self
 
     # 离线配置
     offline: OfflineSettings = OfflineSettings()

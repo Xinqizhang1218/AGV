@@ -36,6 +36,7 @@ class HikvisionColorSource(BaseFrameSource):
         self.payload_size = 0
         self.opened = False
         self.grabbing = False
+        self.software_trigger = False
 
     def _candidate_python_paths(self) -> list[Path]:
         paths: list[Path] = []
@@ -115,7 +116,11 @@ class HikvisionColorSource(BaseFrameSource):
             self._check(self.camera.MV_CC_OpenDevice(access, 0), "打开海康相机")
             self.opened = True
 
-            self._set("MV_CC_SetEnumValue", "TriggerMode", getattr(self.sdk, "MV_TRIGGER_MODE_OFF", 0))
+            if self.software_trigger:
+                self._check(self.camera.MV_CC_SetEnumValue("TriggerMode", 1), "设置软件触发模式")
+                self._check(self.camera.MV_CC_SetEnumValue("TriggerSource", 7), "设置软件触发源")
+            else:
+                self._set("MV_CC_SetEnumValue", "TriggerMode", getattr(self.sdk, "MV_TRIGGER_MODE_OFF", 0))
             self._set("MV_CC_SetIntValue", "Width", self.width)
             self._set("MV_CC_SetIntValue", "Height", self.height)
             self._set("MV_CC_SetBoolValue", "AcquisitionFrameRateEnable", True)
@@ -125,6 +130,11 @@ class HikvisionColorSource(BaseFrameSource):
             self._set("MV_CC_SetEnumValue", "ExposureAuto", auto)
             if not self.auto_exposure and self.exposure is not None:
                 self._set("MV_CC_SetFloatValue", "ExposureTime", float(self.exposure))
+            if self.software_trigger:
+                if self.auto_exposure or self.exposure is None or self.exposure <= 0:
+                    raise SourceError("光源拍照必须使用固定正曝光时间")
+                self._check(self.camera.MV_CC_SetEnumValue("ExposureAuto", 0), "关闭自动曝光")
+                self._check(self.camera.MV_CC_SetFloatValue("ExposureTime", float(self.exposure)), "设置固定曝光")
             if self.gain is not None:
                 self._set("MV_CC_SetFloatValue", "Gain", float(self.gain))
             self._set("MV_CC_SetEnumValue", "BalanceWhiteAuto", 1 if self.auto_white_balance else 0)
@@ -159,6 +169,10 @@ class HikvisionColorSource(BaseFrameSource):
         info = self.sdk.MV_FRAME_OUT_INFO_EX()
         ctypes.memset(ctypes.byref(info), 0, ctypes.sizeof(info))
         raw = (ctypes.c_ubyte * self.payload_size)()
+        if self.software_trigger:
+            # Fail closed if MVS cannot discard a delayed frame from a previous trigger.
+            self._check(self.camera.MV_CC_ClearImageBuffer(), "清理旧帧")
+            self._check(self.camera.MV_CC_SetCommandValue("TriggerSoftware"), "触发曝光")
         code = self.camera.MV_CC_GetOneFrameTimeout(raw, self.payload_size, info, self.timeout_ms)
         self._check(code, "海康相机取图")
         image = self._to_bgr(raw, info)
