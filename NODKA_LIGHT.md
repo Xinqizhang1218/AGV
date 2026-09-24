@@ -17,14 +17,17 @@
 
 SDK 原目录在开发机：
 `D:\sdk\ndj\NKIOSDK_Linux_V5.0.4\NKIOSDK_Linux_V5.0.4\LinuxSDK`。
-将 LinuxSDK 复制到目标 Linux，例如 `/opt/nodka/LinuxSDK`。
+项目内已放置 SDK：`SDK/NKIOSDK_Linux_V5.0.4/LinuxSDK`。
+部署时保留这个目录结构。海康 Python 接口在 `SDK/MvImport`，在线配置已使用该相对路径。
+海康还需要安装目标 Linux 的 MVS 运行库，并正确设置 `MVCAM_COMMON_RUNENV`；
+当前 MvImport 会根据该变量及 CPU 架构查找 `libMvCameraControl.so`，仅复制 Python 文件不足以运行。
 在项目根目录运行以下命令，SDK 路径和 GCC 目录按实际修改：
 
 ```bash
-bash native/build_nodka_light.sh /opt/nodka/LinuxSDK GCC_9.4.0
+bash native/build_nodka_light.sh SDK/NKIOSDK_Linux_V5.0.4/LinuxSDK GCC_9.4.0
 mkdir -p third_party/nodka/config
 # 从 ConfigFile 中挑选与实机型号相符的配置，替换下面的占位路径
-cp /opt/nodka/LinuxSDK/ConfigFile/<平台>/<实际型号>/nkio_config.ini \
+cp SDK/NKIOSDK_Linux_V5.0.4/LinuxSDK/ConfigFile/<平台>/<实际型号>/nkio_config.ini \
   third_party/nodka/config/nkio_config.ini
 ```
 

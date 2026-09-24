@@ -33,7 +33,7 @@ camera:
 
   hikvision:
     installer_path: null
-    python_path: '/app/SDK/MvImport'
+    python_path: "SDK/MvImport"  # 从项目根目录启动；Linux 仍需安装 MVS 运行库。
     serial_number: null
     ip_address: null
     width: 1280
