@@ -105,17 +105,37 @@ class NodkaLightTests(unittest.TestCase):
         other.close()
         self.light.turn_on()
 
-    def test_identity_mismatch_reports_values_without_switch_commands(self):
+    def test_normalized_open_metadata_requires_successful_channel_read(self):
         original_open = self.bridge.agv_light_open
 
         def mismatched_open(port, pointer):
             original_open(port, pointer)
-            pointer._obj.port = 3
+            pointer._obj.port = port - 1
             pointer._obj.device = 0
+            pointer._obj.sdk_return = 0
 
         self.bridge.agv_light_open = mismatched_open
-        with self.assertRaisesRegex(
-                SourceError, 'requested_port=2, returned_port=3, expected_device=1, returned_device=0'):
+        self.light.open()
+        self.assertEqual(self.bridge.events[:5], ['init', 'open', 'get', 'set', 'get'])
+        self.light.turn_on()
+        self.assertEqual(self.bridge.on, 1)
+
+    def test_initial_read_failure_never_sends_switch_commands(self):
+        self.bridge.fail = 'get_error'
+        with self.assertRaises(SourceError):
+            self.light.open()
+        self.assertNotIn('set', self.bridge.events)
+        self.assertEqual(self.bridge.events[-2:], ['close', 'deinit'])
+
+    def test_initial_wrong_channel_never_sends_switch_commands(self):
+        original_get = self.bridge.agv_light_get
+
+        def wrong_channel(device, channel, pointer):
+            original_get(device, channel, pointer)
+            pointer._obj.channel = 8
+
+        self.bridge.agv_light_get = wrong_channel
+        with self.assertRaisesRegex(SourceError, 'initial channel readback invalid'):
             self.light.open()
         self.assertNotIn('set', self.bridge.events)
         self.assertEqual(self.bridge.events[-2:], ['close', 'deinit'])

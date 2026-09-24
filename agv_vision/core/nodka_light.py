@@ -98,11 +98,20 @@ class NodkaLight:
                 self._initialized = True
                 self._port_attempted = True
                 result = self._command("agv_light_open", self.port)
-                if result.port != self.port or result.device != 1:
+                # NP-6133-MVS / SDK 5.0.4 reports port=2, devId=0 for
+                # OpenDevice(3), while device 1 correctly reads CH1. These
+                # open callback fields are diagnostic, not device identity.
+                logging.getLogger(__name__).info(
+                    "NKLC opened requested_port=%s returned_port=%s returned_device=%s",
+                    self.port, result.port, result.device,
+                )
+                state = self._command("agv_light_get", 1, self.channel_mask)
+                if (state.channel != self.channel_mask or state.mode not in (0, 1, 2, 3)
+                        or state.brightness > 100 or state.on not in (0, 1)):
                     raise SourceError(
-                        f"NKLC open callback mismatch: requested_port={self.port}, "
-                        f"returned_port={result.port}, expected_device=1, "
-                        f"returned_device={result.device}, sdk_return={result.sdk_return}"
+                        f"NKLC initial channel readback invalid: expected_channel={self.channel_mask}, "
+                        f"channel={state.channel}, mode={state.mode}, "
+                        f"brightness={state.brightness}, on={state.on}"
                     )
                 self._device_verified = True
                 self.turn_off()
