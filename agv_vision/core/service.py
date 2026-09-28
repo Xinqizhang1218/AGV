@@ -22,6 +22,7 @@ from agv_vision.vision.charuco_detector import CharucoBoardDetector  # Charuco �
 from agv_vision.vision.aruco_detector import ArucoReferenceDetector  # Aruco 检测器
 from agv_vision.vision.handeye_calibrator import PlanarHandEyeCalibrator  # 手眼标定器
 from agv_vision.vision.compensator import CompensationCalculator  # 偏移补偿器
+from agv_vision.utils.timing import log_step, timed_operation
 from agv_vision.utils.time_utils import now_str, today_str  # 时间字符串生成工具，用于文件名
 
 class AGVVisionService:  # 定义 AGV 视觉服务类
@@ -115,6 +116,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             supported_suffixes=self.settings.offline.supported_suffixes,  # 支持的后缀
         )
     
+    @timed_operation
     def batch_capture_handeye_samples(self, image_dir: str, poses_payload: list[dict], output_json: str) -> dict:
         """
         批量离线采集手眼样本。
@@ -148,7 +150,8 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
                 continue
 
             from agv_vision.core.image_io import read_image
-            image = read_image(image_path)
+            with log_step(self.logger, 'read_image'):
+                image = read_image(image_path)
             if image is None:
                 failed_items.append({
                     'sample_id': sample_id,
@@ -158,8 +161,10 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
                 continue
 
             try:
-                obs = self.handeye_charuco_detector.detect(image)
-                vis = self.handeye_charuco_detector.draw(image, obs)
+                with log_step(self.logger, 'detect_handeye_charuco'):
+                    obs = self.handeye_charuco_detector.detect(image)
+                with log_step(self.logger, 'draw_handeye_charuco'):
+                    vis = self.handeye_charuco_detector.draw(image, obs)
                 debug_image_path = self._save_image(f'handeye_{sample_id}', vis)
 
                 sample = HandEyeSample(
@@ -235,6 +240,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         path.mkdir(parents=True, exist_ok=True)
         return path
 
+    @timed_operation
     def _save_image(self, prefix: str, image) -> str:  # 保存图片
         self.debug_dir = self._daily_debug_dir()
         path = self.debug_dir / f'{prefix}_{now_str()}.jpg'  # 拼接文件名
@@ -248,6 +254,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             path = Path.cwd() / path
         return path
 
+    @timed_operation
     def _save_image_to_path(self, image_path: str, image) -> str:
         path = self._resolve_output_path(image_path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -257,6 +264,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             raise RuntimeError(f'图片保存失败: {path}')
         return str(path)
 
+    @timed_operation
     def _save_json(self, prefix: str, payload: dict) -> str:  # 保存 JSON
         self.debug_dir = self._daily_debug_dir()
         path = self.debug_dir / f'{prefix}_{now_str()}.json'  # 拼接文件名
@@ -273,6 +281,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         path.mkdir(parents=True, exist_ok=True)
         return path
 
+    @timed_operation
     def _save_debug_case(self, label: str, raw_image, detected_image, center_payload: dict) -> dict:
         if not self.settings.debug.save_debug_images and not self.settings.debug.save_result_json:
             return {}
@@ -303,18 +312,22 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         )
         return result
 
+    @timed_operation
     def capture_once(self) -> dict:  # 单次拍照
-        frame = self.source.grab()  # 抓取一帧
+        with log_step(self.logger, 'capture_frame'):
+            frame = self.source.grab()  # 抓取一帧
         image_path = self._save_image('capture', frame.color)  # 保存彩色图像
         return {'ok': True, 'image_path': image_path, 'meta': frame.meta, 'shape': list(frame.color.shape)}  # 返回信息
 
 
+    @timed_operation
     def capture_to_path(self, image_path: str) -> dict:
         """
         在线/离线抓取一帧，并保存到后端指定的 imagePath。
         后端接口 /api/v1/agv/photo 会调用这个方法。
         """
-        frame = self.source.grab()
+        with log_step(self.logger, 'capture_frame'):
+            frame = self.source.grab()
         saved_path = self._save_image_to_path(image_path, frame.color)
         self.logger.info('拍照完成 image_path=%s', saved_path)
         return {
@@ -324,6 +337,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             'shape': list(frame.color.shape),
         }
 
+    @timed_operation
     def build_handeye_sample_from_image(
         self,
         sample_id: str,
@@ -343,12 +357,15 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             raise FileNotFoundError(f'手眼标定图片不存在: {path}')
 
         from agv_vision.core.image_io import read_image
-        image = read_image(path)
+        with log_step(self.logger, 'read_image'):
+            image = read_image(path)
         if image is None:
             raise RuntimeError(f'图片读取失败: {path}')
 
-        obs = self.handeye_charuco_detector.detect(image)
-        vis = self.handeye_charuco_detector.draw(image, obs)
+        with log_step(self.logger, 'detect_handeye_charuco'):
+            obs = self.handeye_charuco_detector.detect(image)
+        with log_step(self.logger, 'draw_handeye_charuco'):
+            vis = self.handeye_charuco_detector.draw(image, obs)
         debug_image_path = self._save_image(f'handeye_{sample_id}', vis)
         debug_case = self._save_debug_case(
             f'handeye_{sample_id}',
@@ -385,6 +402,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         )
         return payload
 
+    @timed_operation
     def solve_handeye_from_image_pose_list(self, image_point_list: list[dict]) -> dict:
         """
         根据接口文档 imagePointList 一次性完成：读取图片 -> 识别 ChArUco -> 解算手眼矩阵。
@@ -437,10 +455,14 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             samples_payload.append(sample_payload)
         return self.solve_handeye(samples_payload)
 
+    @timed_operation
     def capture_handeye_sample(self, sample_id: str, robot_x_m: float, robot_y_m: float) -> dict:  # 采集手眼样本
-        frame = self.source.grab()  # 获取一帧
-        obs = self.handeye_charuco_detector.detect(frame.color)  # 检测 Charuco
-        vis = self.handeye_charuco_detector.draw(frame.color, obs)  # 绘制可视化
+        with log_step(self.logger, 'capture_frame'):
+            frame = self.source.grab()  # 获取一帧
+        with log_step(self.logger, 'detect_handeye_charuco'):
+            obs = self.handeye_charuco_detector.detect(frame.color)  # 检测 Charuco
+        with log_step(self.logger, 'draw_handeye_charuco'):
+            vis = self.handeye_charuco_detector.draw(frame.color, obs)  # 绘制可视化
         image_path = self._save_image(f'handeye_{sample_id}', vis)  # 保存可视化图片
         debug_case = self._save_debug_case(
             f'handeye_{sample_id}',
@@ -466,6 +488,7 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         self.logger.info('采集手眼样本 sample_id=%s robot=(%.3f, %.3f)', sample_id, robot_x_m, robot_y_m)  # 日志
         return payload  # 返回字典
 
+    @timed_operation
     def solve_handeye(self, samples_payload: list[dict]) -> dict:  # 求解手眼标定
         from agv_vision.core.models import CharucoObservation  # 导入 CharucoObservation
         samples: list[HandEyeSample] = []  # 初始化样本列表
@@ -480,7 +503,8 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
                 image_path=item.get('image_path'),
                 meta=item.get('meta', {}),
             ))
-        result = self.handeye_calibrator.solve(samples)  # 调用标定器求解
+        with log_step(self.logger, 'solve_handeye_matrix'):
+            result = self.handeye_calibrator.solve(samples)  # 调用标定器求解
         if result.rmse_m > self.handeye_calibrator.RMSE_WARNING_M:
             self.logger.warning(
                 '手眼标定 RMSE 偏大: %.3f mm，建议重新采集',
@@ -497,9 +521,11 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
             payload['local_json'] = self._save_json('handeye_result', payload)  # 保存
         return payload  # 返回结果
 
+    @timed_operation
     def _detect_station_reference(self, image, station_id: str, reference_type: str):
         if reference_type == 'charuco':
-            observation = self.station_charuco_detector.detect(image)
+            with log_step(self.logger, 'detect_station_charuco'):
+                observation = self.station_charuco_detector.detect(image)
             corner_ids = observation.corner_ids or []
             corners = [
                 {'id': int(corner_id), 'x': float(point[0]), 'y': float(point[1])}
@@ -520,14 +546,19 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
                 charuco_corners=corners,
                 charuco_object_points_m=observation.board_points_m,
             )
-            return reference, self.station_charuco_detector.draw(image, observation)
+            with log_step(self.logger, 'draw_station_charuco'):
+                return reference, self.station_charuco_detector.draw(image, observation)
 
-        reference = self.aruco_detector.detect(image, station_id=station_id)
-        return reference, self.aruco_detector.draw(image, reference)
+        with log_step(self.logger, 'detect_aruco'):
+            reference = self.aruco_detector.detect(image, station_id=station_id)
+        with log_step(self.logger, 'draw_aruco'):
+            return reference, self.aruco_detector.draw(image, reference)
 
     # def collect_station_reference(self, station_id: str) -> dict:  # 采集工位参考点
+    @timed_operation
     def collect_station_reference(self, station_id: str, image_path: str | None = None) -> dict:
-        frame = self.source.grab()  # 抓取一帧
+        with log_step(self.logger, 'capture_frame'):
+            frame = self.source.grab()  # 抓取一帧
         saved_image_path = self._save_image_to_path(image_path, frame.color) if image_path else None
         reference_type = self.settings.cross_calibration.target_type
         ref, vis = self._detect_station_reference(frame.color, station_id, reference_type)
@@ -566,8 +597,10 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         return payload  # 返回 payload
 
     # def compensate(self, reference_payload: dict, handeye_payload: dict | None = None) -> dict:  # 偏移补偿
+    @timed_operation
     def compensate(self, reference_payload: dict, handeye_payload: dict | None = None, image_path: str | None = None) -> dict:
-        frame = self.source.grab()  # 获取当前帧
+        with log_step(self.logger, 'capture_frame'):
+            frame = self.source.grab()  # 获取当前帧
         raw_debug_image_path = self._save_image('compensation_current_raw', frame.color)
         self.logger.info('二次补偿当前原始帧已保存 image_path=%s', raw_debug_image_path)
         saved_image_path = self._save_image_to_path(image_path, frame.color) if image_path else None
@@ -639,11 +672,12 @@ class AGVVisionService:  # 定义 AGV 视觉服务类
         )
         angle_calibration = (handeye_payload or {}).get('angle_calibration')
         current_center_payload['angle_calibration'] = angle_calibration
-        result = self.compensator.compute(
-            reference,
-            current_ref,
-            angle_calibration=angle_calibration,
-        )
+        with log_step(self.logger, 'compute_compensation'):
+            result = self.compensator.compute(
+                reference,
+                current_ref,
+                angle_calibration=angle_calibration,
+            )
         current_center_payload['compensation'] = dataclass_to_dict(result)
         if debug_case.get('debug_center_json_path'):
             Path(debug_case['debug_center_json_path']).write_text(

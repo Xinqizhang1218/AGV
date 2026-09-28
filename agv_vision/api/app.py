@@ -225,7 +225,7 @@ def _join_log_lines(lines: list[str]) -> str:
 
 @app.middleware('http')
 async def log_http_request_response(request: Request, call_next):
-    started = time.time()
+    started = time.perf_counter()
     request_body = await request.body()
 
     async def receive():
@@ -259,7 +259,7 @@ async def log_http_request_response(request: Request, call_next):
     try:
         response = await call_next(request)
     except Exception:
-        elapsed_ms = (time.time() - started) * 1000
+        elapsed_ms = (time.perf_counter() - started) * 1000
         logger.exception(
             '\n========== HTTP接口异常 ==========\n'
             '接口说明: %s\n'
@@ -280,7 +280,7 @@ async def log_http_request_response(request: Request, call_next):
         response_body += chunk
 
     response_payload = _decode_body_for_log(response_body)
-    elapsed_ms = (time.time() - started) * 1000
+    elapsed_ms = (time.perf_counter() - started) * 1000
 
     logger.info(
         '\n========== 返回HTTP响应 ==========\n'
