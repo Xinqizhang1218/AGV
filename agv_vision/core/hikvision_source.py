@@ -234,6 +234,23 @@ class HikvisionColorSource(BaseFrameSource):
         width, height = int(info.nWidth), int(info.nHeight)
         pixel_type, length = int(info.enPixelType), int(info.nFrameLen)
         if width <= 0 or height <= 0 or not 0 < length <= len(raw):
+            # Inspect SDK output without guessing a length or changing the ABI.
+            details = {name: int(getattr(info, name, -1)) for name in (
+                "nWidth", "nHeight", "enPixelType", "nFrameNum", "nFrameLen",
+                "nFrameLenEx", "nExtendWidth", "nExtendHeight", "nLostPacket",
+            )}
+            header_hex = "unavailable"
+            offsets = {}
+            if isinstance(info, ctypes.Structure):
+                header_hex = ctypes.string_at(
+                    ctypes.addressof(info), min(ctypes.sizeof(info), 160)
+                ).hex()
+                offsets = {name: getattr(type(info), name).offset
+                           for name in details if hasattr(type(info), name)}
+            logging.getLogger(__name__).error(
+                "HIK_FRAME_DIAGNOSTIC fields=%s offsets=%s buffer=%s header_hex=%s",
+                details, offsets, len(raw), header_hex,
+            )
             raise SourceError(f"海康帧尺寸或长度异常: {width}x{height}, frame={length}, buffer={len(raw)}")
         source = np.ctypeslib.as_array(raw)[:length]
         if pixel_type == getattr(self.sdk, "PixelType_Gvsp_Mono8", -1):
