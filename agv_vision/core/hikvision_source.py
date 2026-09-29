@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ctypes
 import importlib
+import logging
 import os
 import socket
 import sys
@@ -88,6 +89,52 @@ class HikvisionColorSource(BaseFrameSource):
         except Exception:
             pass
 
+    def _set_enum_checked(self, key: str, value: int) -> None:
+        self._check(self.camera.MV_CC_SetEnumValue(key, value), f"设置 {key}={value}")
+        actual = self.sdk.MVCC_ENUMVALUE()
+        self._check(self.camera.MV_CC_GetEnumValue(key, actual), f"读回 {key}")
+        if int(actual.nCurValue) != value:
+            raise SourceError(f"{key} 读回不一致: {actual.nCurValue}，预期 {value}")
+
+    def _configure_software_trigger(self) -> None:
+        selector = self.sdk.MVCC_ENUMVALUE()
+        self._check(self.camera.MV_CC_GetEnumValue("TriggerSelector", selector),
+                    "读取 TriggerSelector 支持项")
+        if not 0 < selector.nSupportedNum <= len(selector.nSupportValue):
+            raise SourceError("TriggerSelector 支持项数量异常")
+        supported = {}
+        for index in range(selector.nSupportedNum):
+            entry = self.sdk.MVCC_ENUMENTRY()
+            entry.nValue = selector.nSupportValue[index]
+            self._check(self.camera.MV_CC_GetEnumEntrySymbolic("TriggerSelector", entry),
+                        "读取 TriggerSelector 选项名称")
+            supported[self._decode_c_string(entry.chSymbolic)] = int(entry.nValue)
+        selected = next((name for name in ("FrameStart", "FrameBurstStart")
+                         if name in supported), None)
+        if selected is None:
+            raise SourceError(f"相机不支持单帧软件触发类型: {supported}")
+        self._set_enum_checked("TriggerSelector", supported[selected])
+        self._set_enum_checked("TriggerMode", 0)
+        self._set_enum_checked("AcquisitionMode", 2)  # Continuous: accept repeated triggers.
+        self._set_enum_checked("TriggerSource", 7)  # Software
+        self._set_enum_checked("TriggerMode", 1)
+        if selected == "FrameBurstStart":
+            # Never assume the camera's persisted burst length is one frame.
+            use_ex = (hasattr(self.sdk, "MVCC_INTVALUE_EX")
+                      and hasattr(self.camera, "MV_CC_GetIntValueEx")
+                      and hasattr(self.camera, "MV_CC_SetIntValueEx"))
+            value_type = self.sdk.MVCC_INTVALUE_EX if use_ex else self.sdk.MVCC_INTVALUE
+            getter = self.camera.MV_CC_GetIntValueEx if use_ex else self.camera.MV_CC_GetIntValue
+            setter = self.camera.MV_CC_SetIntValueEx if use_ex else self.camera.MV_CC_SetIntValue
+            key = "AcquisitionBurstFrameCount"
+            self._check(setter(key, 1), f"设置 {key}=1（单帧突发）")
+            actual = value_type()
+            self._check(getter(key, actual), f"读回 {key}")
+            if int(actual.nCurValue) != 1:
+                raise SourceError(f"{key}={actual.nCurValue}，无法保证一次触发一帧")
+        logging.getLogger(__name__).info(
+            "Hikvision software trigger ready: selector=%s, frames_per_trigger=1", selected)
+
     def open(self) -> None:
         self.sdk = self._load_sdk()
         try:
@@ -117,8 +164,7 @@ class HikvisionColorSource(BaseFrameSource):
             self.opened = True
 
             if self.software_trigger:
-                self._check(self.camera.MV_CC_SetEnumValue("TriggerMode", 1), "设置软件触发模式")
-                self._check(self.camera.MV_CC_SetEnumValue("TriggerSource", 7), "设置软件触发源")
+                self._configure_software_trigger()
             else:
                 self._set("MV_CC_SetEnumValue", "TriggerMode", getattr(self.sdk, "MV_TRIGGER_MODE_OFF", 0))
             self._set("MV_CC_SetIntValue", "Width", self.width)
