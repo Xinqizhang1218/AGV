@@ -221,7 +221,31 @@ class HikvisionColorSource(BaseFrameSource):
             self._check(self.camera.MV_CC_SetCommandValue("TriggerSoftware"), "触发曝光")
         code = self.camera.MV_CC_GetOneFrameTimeout(raw, self.payload_size, info, self.timeout_ms)
         self._check(code, "海康相机取图")
+        logger = logging.getLogger(__name__)
+        frame_length = int(info.nFrameLen)
+        if 0 < frame_length <= len(raw):
+            pixels = np.ctypeslib.as_array(raw)[:frame_length]
+            logger.info(
+                "HIK_RAW_STATS frame_id=%s pixel_type=0x%X frame_len=%s frame_len_ex=%s "
+                "min=%s max=%s mean=%.6f nonzero=%s",
+                info.nFrameNum, int(info.enPixelType), frame_length,
+                getattr(info, "nFrameLenEx", None), int(pixels.min()), int(pixels.max()),
+                float(pixels.mean()), int(np.count_nonzero(pixels)),
+            )
+        # Diagnostic reads must not mask a capture result or change camera settings.
+        for key in ("ExposureTime", "Gain"):
+            try:
+                value = self.sdk.MVCC_FLOATVALUE()
+                result = self.camera.MV_CC_GetFloatValue(key, value)
+                logger.info("HIK_CAMERA_READBACK key=%s result=0x%08X value=%s",
+                            key, result & 0xFFFFFFFF,
+                            value.fCurValue if result == 0 else None)
+            except Exception as exc:
+                logger.warning("HIK_CAMERA_READBACK key=%s unavailable=%s", key, exc)
         image = self._to_bgr(raw, info)
+        logger.info("HIK_BGR_STATS min=%s max=%s mean=%.6f nonzero=%s",
+                    int(image.min()), int(image.max()), float(image.mean()),
+                    int(np.count_nonzero(image)))
         return FrameBundle(
             color=image,
             timestamp_ms=int(getattr(info, "nHostTimeStamp", 0)) or None,

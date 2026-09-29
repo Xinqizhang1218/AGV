@@ -4,6 +4,7 @@ import tempfile
 import threading
 import time
 import unittest
+import numpy as np
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -214,7 +215,7 @@ class CaptureTests(unittest.TestCase):
 
         class FrameInfo(ctypes.Structure):
             _fields_ = [(name, ctypes.c_uint32) for name in
-                        ('nHostTimeStamp', 'nWidth', 'nHeight', 'enPixelType', 'nFrameNum')]
+                        ('nHostTimeStamp', 'nWidth', 'nHeight', 'enPixelType', 'nFrameNum', 'nFrameLen')]
 
         def record(name):
             def call(*args):
@@ -230,7 +231,7 @@ class CaptureTests(unittest.TestCase):
         camera.payload_size = 16
         camera.grabbing = True
         camera.software_trigger = True
-        camera._to_bgr = lambda *args: 'image'
+        camera._to_bgr = lambda *args: np.zeros((2, 2, 3), dtype=np.uint8)
         camera.grab()
         self.assertEqual(events, ['clear', 'trigger', 'read'])
         events.clear()
