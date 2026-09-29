@@ -96,6 +96,26 @@ class HikvisionColorSource(BaseFrameSource):
         if int(actual.nCurValue) != value:
             raise SourceError(f"{key} 读回不一致: {actual.nCurValue}，预期 {value}")
 
+    def _configure_gige_packet_size(self, transport: int) -> None:
+        if transport != self.sdk.MV_GIGE_DEVICE:
+            return
+        # Validated on the industrial PC's MTU-1500 link. Reapply on every open.
+        packet_size = 1500
+        key = "GevSCPSPacketSize"
+        use_ex = (hasattr(self.sdk, "MVCC_INTVALUE_EX")
+                  and hasattr(self.camera, "MV_CC_SetIntValueEx")
+                  and hasattr(self.camera, "MV_CC_GetIntValueEx"))
+        value_type = self.sdk.MVCC_INTVALUE_EX if use_ex else self.sdk.MVCC_INTVALUE
+        setter = self.camera.MV_CC_SetIntValueEx if use_ex else self.camera.MV_CC_SetIntValue
+        getter = self.camera.MV_CC_GetIntValueEx if use_ex else self.camera.MV_CC_GetIntValue
+        self._check(setter(key, packet_size), f"设置 {key}={packet_size}")
+        actual = value_type()
+        self._check(getter(key, actual), f"读回 {key}")
+        if int(actual.nCurValue) != packet_size:
+            raise SourceError(f"{key} 读回不一致: {actual.nCurValue}，预期 {packet_size}")
+        logging.getLogger(__name__).info("Hikvision GigE packet size verified: %s=%s",
+                                         key, packet_size)
+
     def _configure_software_trigger(self) -> None:
         selector = self.sdk.MVCC_ENUMVALUE()
         self._check(self.camera.MV_CC_GetEnumValue("TriggerSelector", selector),
@@ -162,6 +182,8 @@ class HikvisionColorSource(BaseFrameSource):
             access = getattr(self.sdk, "MV_ACCESS_Exclusive", 1)
             self._check(self.camera.MV_CC_OpenDevice(access, 0), "打开海康相机")
             self.opened = True
+
+            self._configure_gige_packet_size(selected.nTLayerType)
 
             if self.software_trigger:
                 self._configure_software_trigger()
