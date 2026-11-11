@@ -1,0 +1,342 @@
+{
+  "station_id": "station_004",
+  "observation_pose": [
+    -0.5681776404380798,
+    0.8799128532409668,
+    0.39635950326919556,
+    3.1410107612609863,
+    -6.72730629958096e-06,
+    0.7737335562705994
+  ],
+  "reference": {
+    "stationId": "station_004",
+    "imagePath": "D:\\data\\station0923_30cm_7cm\\station_004\\reference.jpg",
+    "markerId": 2,
+    "corners": [
+      {
+        "id": 0,
+        "x": 733.1604614257812,
+        "y": 479.5505676269531
+      },
+      {
+        "id": 1,
+        "x": 895.03271484375,
+        "y": 478.56109619140625
+      },
+      {
+        "id": 2,
+        "x": 1056.8656005859375,
+        "y": 477.53936767578125
+      },
+      {
+        "id": 3,
+        "x": 1218.6494140625,
+        "y": 476.54559326171875
+      },
+      {
+        "id": 4,
+        "x": 734.1766967773438,
+        "y": 641.4553833007812
+      },
+      {
+        "id": 5,
+        "x": 896.1635131835938,
+        "y": 640.4281616210938
+      },
+      {
+        "id": 6,
+        "x": 1058.084716796875,
+        "y": 639.40771484375
+      },
+      {
+        "id": 7,
+        "x": 1219.8289794921875,
+        "y": 638.4342041015625
+      },
+      {
+        "id": 8,
+        "x": 735.4085693359375,
+        "y": 803.376220703125
+      },
+      {
+        "id": 9,
+        "x": 897.40966796875,
+        "y": 802.328125
+      },
+      {
+        "id": 10,
+        "x": 1059.354736328125,
+        "y": 801.2922973632812
+      },
+      {
+        "id": 11,
+        "x": 1220.9566650390625,
+        "y": 800.2181396484375
+      },
+      {
+        "id": 12,
+        "x": 736.6373901367188,
+        "y": 965.3263549804688
+      },
+      {
+        "id": 13,
+        "x": 898.5848999023438,
+        "y": 964.1500854492188
+      },
+      {
+        "id": 14,
+        "x": 1060.3843994140625,
+        "y": 963.049560546875
+      },
+      {
+        "id": 15,
+        "x": 1222.20361328125,
+        "y": 961.8771362304688
+      }
+    ]
+  },
+  "handeye": {
+    "rmseM": 0.00016507846846552216,
+    "sampleCount": 70,
+    "pose3d": {
+      "version": 1,
+      "cameraMatrix": [
+        [
+          4735.589722563242,
+          0.0,
+          1192.4027112559334
+        ],
+        [
+          0.0,
+          4736.0820041318875,
+          1033.0845231513094
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distCoeffs": [
+        -0.02204750689143773,
+        -0.9998825537591687,
+        -0.00048383978888166395,
+        -0.00013056279294400018,
+        8.373978931657172
+      ],
+      "gTc": [
+        [
+          -0.7052089355145024,
+          -0.7089453814837371,
+          -0.008763751672721462,
+          -0.07587904907133805
+        ],
+        [
+          0.7089986514757064,
+          -0.705134526330979,
+          -0.010305919736554356,
+          -0.06553428549531706
+        ],
+        [
+          0.0011267103145456009,
+          -0.013481314804740838,
+          0.9999084881502919,
+          0.103683074460201
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "imageSize": [
+        2448,
+        2048
+      ],
+      "handEyeMethod": "PARK",
+      "cameraCalibrationRmsPx": 0.06693249502931467
+    },
+    "source": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212\\handeye_result.json",
+    "usage_notes": [
+      "Selection sensitivity remains. Held-out errors are internal fixed-board consistency, not independently measured physical accuracy; additional rotations did not improve held-out orientation error.",
+      "Same camera mounting, focus, robot reported frame required; recollect station reference with these intrinsics."
+    ]
+  },
+  "vision_base_url": "http://127.0.0.1:8088",
+  "vision_response_pose_mode": "delta",
+  "vision_image_dir": "D:/data/station0923_30cm_7cm",
+  "motion": {
+    "plc_ip": "192.168.1.88",
+    "plc_port": 502,
+    "plc_timeout_seconds": 3.0,
+    "motion_timeout_seconds": 120.0,
+    "return_timeout_seconds": 120.0,
+    "poll_seconds": 0.1,
+    "position_tolerance_m": 0.0005,
+    "orientation_tolerance_deg": 0.2,
+    "arrival_stable_seconds": 0.5,
+    "return_stable_seconds": 0.5,
+    "photo_hold_seconds": 2.0,
+    "pose_verify_timeout_seconds": 3.0,
+    "expected_return_pose": null,
+    "start_task_single_pose_confirmed": false
+  },
+  "convergence": {
+    "max_corrections": 1,
+    "max_residual_position_m": 0.0005,
+    "max_residual_orientation_deg": 0.2,
+    "required_consecutive_passes": 2,
+    "verification_interval_seconds": 0.5,
+    "damping": 1.0
+  },
+  "safety": {
+    "max_step_translation_m": 0.05,
+    "max_step_orientation_deg": 10.0,
+    "max_total_translation_m": 0.08,
+    "max_total_orientation_deg": 15.0,
+    "workspace_limits_m": {
+      "x": [
+        -0.6,
+        -0.5
+      ],
+      "y": [
+        0.84,
+        0.92
+      ],
+      "z": [
+        0.28,
+        0.45
+      ]
+    },
+    "orientation_limits_rad": {
+      "rx": [
+        3.0,
+        3.2
+      ],
+      "ry": [
+        -0.1,
+        1.0
+      ],
+      "rz": [
+        0.65,
+        1.0
+      ]
+    }
+  },
+  "schema_version": 1,
+  "created_at": "2026-09-23T10:22:03",
+  "reference_capture": {
+    "capture_mode": "idle_current_pose_no_motion",
+    "actual_pose_before": [
+      -0.5681776404380798,
+      0.8799128532409668,
+      0.39635950326919556,
+      3.1410107612609863,
+      -6.72730629958096e-06,
+      0.7737335562705994
+    ],
+    "actual_pose_after": [
+      -0.5681777000427246,
+      0.879912793636322,
+      0.39635950326919556,
+      3.1410109996795654,
+      -5.3774906518810894e-06,
+      0.7737335562705994
+    ],
+    "image_path": "D:/data/station0923_30cm_7cm/station_004/reference.jpg",
+    "capture_validation": "continuous_plc_polling_not_hardware_synchronized",
+    "raw_response": {
+      "code": 0,
+      "msg": "跨机台标定完成",
+      "data": {
+        "stationId": "station_004",
+        "imagePath": "D:\\data\\station0923_30cm_7cm\\station_004\\reference.jpg",
+        "markerId": 2,
+        "corners": [
+          {
+            "id": 0,
+            "x": 733.1604614257812,
+            "y": 479.5505676269531
+          },
+          {
+            "id": 1,
+            "x": 895.03271484375,
+            "y": 478.56109619140625
+          },
+          {
+            "id": 2,
+            "x": 1056.8656005859375,
+            "y": 477.53936767578125
+          },
+          {
+            "id": 3,
+            "x": 1218.6494140625,
+            "y": 476.54559326171875
+          },
+          {
+            "id": 4,
+            "x": 734.1766967773438,
+            "y": 641.4553833007812
+          },
+          {
+            "id": 5,
+            "x": 896.1635131835938,
+            "y": 640.4281616210938
+          },
+          {
+            "id": 6,
+            "x": 1058.084716796875,
+            "y": 639.40771484375
+          },
+          {
+            "id": 7,
+            "x": 1219.8289794921875,
+            "y": 638.4342041015625
+          },
+          {
+            "id": 8,
+            "x": 735.4085693359375,
+            "y": 803.376220703125
+          },
+          {
+            "id": 9,
+            "x": 897.40966796875,
+            "y": 802.328125
+          },
+          {
+            "id": 10,
+            "x": 1059.354736328125,
+            "y": 801.2922973632812
+          },
+          {
+            "id": 11,
+            "x": 1220.9566650390625,
+            "y": 800.2181396484375
+          },
+          {
+            "id": 12,
+            "x": 736.6373901367188,
+            "y": 965.3263549804688
+          },
+          {
+            "id": 13,
+            "x": 898.5848999023438,
+            "y": 964.1500854492188
+          },
+          {
+            "id": 14,
+            "x": 1060.3843994140625,
+            "y": 963.049560546875
+          },
+          {
+            "id": 15,
+            "x": 1222.20361328125,
+            "y": 961.8771362304688
+          }
+        ]
+      },
+      "timestamp": 1790130123188
+    }
+  }
+}

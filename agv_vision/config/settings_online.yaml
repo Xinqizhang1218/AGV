@@ -35,9 +35,9 @@ camera:
     installer_path: null
     python_path: "SDK/MvImport"  # 对应 pkg5_260728/SDK/MvImport；在项目根目录启动，Linux 另需 MVS 运行库。
     serial_number: null
-    ip_address: null
-    width: 1280
-    height: 800
+    ip_address: 192.168.1.118
+    width: 2448
+    height: 2048
     fps: 15
 
   width: 1280              # 旧配置兼容兜底；优先使用厂商配置块。
@@ -83,7 +83,7 @@ camera:
   #   calibration_rms_px: 1.058
   #   source: '8mm lens + 3.45um pixel pitch; distortion fitted from p01-p30'
   intrinsics:
-    enabled: false
+    enabled: false #采集 ChArUco 图片后，在执行标定求解时计算内参和畸变，并不是连接相机后自动获取。
     image_size: [2448, 2048]
     camera_matrix:
       - [2347.8142312772247, 0.0, 1224.0]
@@ -112,51 +112,7 @@ offline:
     - '.bmp'
 
 
-# =====================================================
-# Charuco 标定板参数（手眼标定使用）
-# =====================================================
-# charuco:
 
-#   dictionary_name: DICT_5X5_100   # Aruco字典类型
-
-#   squares_x: 5                    # X方向格子数
-
-#   squares_y: 5                    # Y方向格子数
-
-#   square_length_m: 0.030          # 大格边长(m)
-
-#   marker_length_m: 0.022          # 内部黑码边长(m)
-
-#   min_corners: 8                  # 至少识别角点数量
-
-#   adaptive_thresh_constant: 7.0   # 自适应阈值参数
-
-#   min_marker_perimeter_rate: 0.03 # 最小码尺寸比例
-
-#   max_marker_perimeter_rate: 4.0  # 最大码尺寸比例
-
-#   use_subpix: true               # 开启亚像素角点优化
-# charuco:
-
-#   dictionary_name: DICT_5X5_100
-
-#   squares_x: 5
-
-#   squares_y: 5
-
-#   square_length_m: 0.020
-
-#   marker_length_m: 0.012
-
-#   min_corners: 5
-
-#   adaptive_thresh_constant: 7.0
-
-#   min_marker_perimeter_rate: 0.15
-
-#   max_marker_perimeter_rate: 4.0
-
-#   use_subpix: true
 # charuco:
 #   dictionary_name: DICT_4X4_50
 #   squares_x: 5
@@ -169,6 +125,55 @@ offline:
 #   max_marker_perimeter_rate: 4.0
 #   use_subpix: true
 # 手眼采样与标定专用；长度单位：米。
+# 备用 ChArUco 标定板（全部注释，暂不启用）
+# 来源：标定版目录内三份 CHARUCO_DICT_4X4 铝板 V1 图纸（2026/09/04）。
+# 长度单位为米；squares_x/y 是格子数，不是内角点数。
+# 图纸仅注明 DICT_4X4，以下沿用当前 DICT_4X4_50，启用前需核对字典及 ID 排列。
+# 检测参数沿用当前配置；将备选参数填入对应的新配置块，勿直接取消 charuco 注释。
+#
+# 方案一：50x50x3 mm 铝板，图案 40x40 mm，格子 8 mm，标记 5.333 mm。
+# 来源文件：CHARUCO_DICT_4X4铝板-50x50x3mm-8-V1.pdf
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.008
+#   marker_length_m: 0.005333
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+#
+# 方案二：60x60x3 mm 铝板，图案 50x50 mm，格子 10 mm，标记 6.667 mm。
+# 来源文件：CHARUCO_DICT_4X4铝板-60x60x3mm-10-V1.pdf
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.010
+#   marker_length_m: 0.006667
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+#
+# 方案三：70x70x3 mm 铝板，图案 60x60 mm，格子 12 mm，标记 8 mm。
+# 来源文件：CHARUCO_DICT_4X4铝板-70x70x3mm-12-V1.pdf
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.012
+#   marker_length_m: 0.008
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+# =====================================================
+
 handeye_charuco:
   dictionary_name: DICT_4X4_50
   squares_x: 5
@@ -186,8 +191,18 @@ station_charuco:
   dictionary_name: DICT_4X4_50
   squares_x: 5
   squares_y: 5
-  square_length_m: 0.030
-  marker_length_m: 0.022
+  #7cm板子
+  # square_length_m: 0.012
+  # marker_length_m: 0.008
+  #6cm板子
+  # square_length_m: 0.010
+  # marker_length_m: 0.006667
+  #5cm板子
+  # square_length_m: 0.008 
+  # marker_length_m: 0.005333
+  #4cm板子
+  square_length_m: 0.006 
+  marker_length_m: 0.004 
   min_corners: 5
   adaptive_thresh_constant: 7.0
   min_marker_perimeter_rate: 0.015
@@ -230,7 +245,7 @@ cross_calibration:
 # 六自由度补偿安全阈值；超过阈值时接口拒绝返回可执行目标位姿
 compensation:
   max_translation_m: 0.05
-  max_rotation_rad: 0.174533
+  max_rotation_rad: 0.5
 
 
 # =====================================================
@@ -264,10 +279,12 @@ debug:
 # =====================================================
 service:
 
+
   host: 0.0.0.0                # 所有网卡可访问
 
   port: 8088                   # 服务端口，按后端接口文档默认心跳/服务端口
 
+# 光源控制配置
 light:
   enabled: true
   library_path: third_party/nodka/lib/libagv_nodka_light.so
@@ -275,5 +292,5 @@ light:
   port: 3  # NP-6133-MVS 实机已验证
   channel_mask: 1  # 机箱 CH1 = SDK CH0 = 0x01，实机已确认亮灯
   brightness: 50  # 0～100；机箱 CH1 已实测此亮度能亮灯。
-  settle_ms: 100  # 开灯后等待毫秒数；每张图取完关灯，手眼整组常亮尚未实现。
+  settle_ms: 1000  # 开灯后等待毫秒数；每张图取完关灯，手眼整组常亮尚未实现。
 

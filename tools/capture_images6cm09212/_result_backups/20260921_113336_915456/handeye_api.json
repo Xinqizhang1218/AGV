@@ -1,0 +1,68 @@
+{
+  "rmseM": 0.00016507846846552216,
+  "sampleCount": 70,
+  "pose3d": {
+    "version": 1,
+    "cameraMatrix": [
+      [
+        4735.589722563242,
+        0.0,
+        1192.4027112559334
+      ],
+      [
+        0.0,
+        4736.0820041318875,
+        1033.0845231513094
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distCoeffs": [
+      -0.02204750689143773,
+      -0.9998825537591687,
+      -0.00048383978888166395,
+      -0.00013056279294400018,
+      8.373978931657172
+    ],
+    "gTc": [
+      [
+        -0.7052089355145024,
+        -0.7089453814837371,
+        -0.008763751672721462,
+        -0.07587904907133805
+      ],
+      [
+        0.7089986514757064,
+        -0.705134526330979,
+        -0.010305919736554356,
+        -0.06553428549531706
+      ],
+      [
+        0.0011267103145456009,
+        -0.013481314804740838,
+        0.9999084881502919,
+        0.103683074460201
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "imageSize": [
+      2448,
+      2048
+    ],
+    "handEyeMethod": "PARK",
+    "cameraCalibrationRmsPx": 0.06693249502931467
+  },
+  "source": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212\\handeye_result.json",
+  "usage_notes": [
+    "Selection sensitivity remains. Held-out errors are internal fixed-board consistency, not independently measured physical accuracy; additional rotations did not improve held-out orientation error.",
+    "Same camera mounting, focus, robot reported frame required; recollect station reference with these intrinsics."
+  ]
+}

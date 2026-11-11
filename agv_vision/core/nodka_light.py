@@ -11,6 +11,7 @@ import threading
 import time
 
 from agv_vision.core.exceptions import SourceError
+from agv_vision.utils.timing import log_step
 
 
 class LightResult(ctypes.Structure):
@@ -20,6 +21,14 @@ class LightResult(ctypes.Structure):
             "mode", "brightness", "on",
         )
     ]
+
+
+class LightStatusError(SourceError):
+    """Carry a status snapshot taken while holding the capture lock."""
+
+    def __init__(self, message: str, held: bool, state: str = 'unknown'):
+        super().__init__(message)
+        self.status = {'state': state, 'held': held}
 
 
 class NodkaLight:
@@ -138,6 +147,17 @@ class NodkaLight:
     def turn_on(self) -> None:
         self._set_switch(True)
 
+    def read_state(self) -> str:
+        """Read the controller without changing its output."""
+        with self._lock:
+            if not self._initialized or not self._device_verified:
+                raise SourceError("NKLC controller is not open")
+            state = self._command("agv_light_get", 1, self.channel_mask)
+            if (state.channel != self.channel_mask or state.mode != 0
+                    or state.brightness > 100 or state.on not in (0, 1)):
+                raise SourceError("NKLC status readback invalid")
+            return 'on' if state.on else 'off'
+
     def turn_off(self) -> None:
         self._set_switch(False)
 
@@ -170,20 +190,28 @@ class NodkaLight:
 
 
 class IlluminatedFrameSource:
-    """Serialize the entire light/exposure transaction and always attempt off."""
+    """Serialize light control and exposure; retain light only while held."""
     def __init__(self, source, light: NodkaLight, settle_ms: int):
         self.source = source
         self.light = light
         self.settle_ms = settle_ms
         self._lock = threading.RLock()
         self._faulted = False
+        self._held = False
+        self._is_open = False
 
     def open(self):
         with self._lock:
+            if self._is_open:
+                if self._faulted:
+                    raise SourceError("Light capture faulted; close before reopening")
+                return
             self.light.open()
             try:
                 self.source.open()
                 self._faulted = False
+                self._held = False
+                self._is_open = True
                 logging.getLogger(__name__).info(
                     "光源拍照就绪 port=%s channel_mask=0x%02X brightness=%s settle_ms=%s",
                     self.light.port, self.light.channel_mask, self.light.brightness, self.settle_ms,
@@ -195,24 +223,83 @@ class IlluminatedFrameSource:
                     logging.getLogger(__name__).exception("NKLC camera-start cleanup failed")
                 raise
 
+    def control_light(self, action: str) -> None:
+        if action not in ('on', 'off'):
+            raise ValueError('data.action 仅支持 on 或 off')
+        with self._lock:
+            if not self._is_open:
+                raise SourceError('光源未连接')
+            if action == 'on' and self._faulted:
+                raise SourceError('光源采集故障，请检查硬件并关闭后重新打开采集源')
+            if action == 'off':
+                self._held = False
+                try:
+                    self.light.turn_off()
+                except BaseException:
+                    self._faulted = True
+                    raise
+                return
+            try:
+                self.light.turn_on()
+                time.sleep(self.settle_ms / 1000.0)
+                self._held = True
+            except BaseException:
+                self._faulted = True
+                self._held = False
+                try:
+                    self.light.turn_off()
+                except Exception:
+                    logging.getLogger(__name__).exception('NKLC cleanup failed after on')
+                raise
+
+    def get_light_status(self) -> dict:
+        with self._lock:
+            try:
+                if not self._is_open:
+                    raise SourceError('光源未连接')
+                state = self.light.read_state()
+            except Exception as exc:
+                self._faulted = True
+                raise LightStatusError(str(exc), self._held) from exc
+            if self._held and state != 'on':
+                self._faulted = True
+            if self._faulted:
+                raise LightStatusError('光源采集故障未恢复', self._held, state)
+            return {'state': state, 'held': self._held}
+
     def grab(self):
+        logger = logging.getLogger(__name__)
         with self._lock:
             if self._faulted:
                 raise SourceError("Light capture faulted; close and reopen after checking hardware")
             try:
-                self.light.turn_on()
-                logging.getLogger(__name__).info("光源开灯读回确认，等待稳定后触发拍照")
-                time.sleep(self.settle_ms / 1000.0)
-                frame = self.source.grab()
+                if self._held:
+                    with log_step(logger, 'light_check_held'):
+                        if self.light.read_state() != 'on':
+                            raise SourceError('常亮保持期间光源未开启')
+                else:
+                    with log_step(logger, 'light_turn_on'):
+                        self.light.turn_on()
+                    logger.info("光源开灯读回确认，等待稳定后触发拍照 settle_ms=%s", self.settle_ms)
+                    with log_step(logger, 'light_settle'):
+                        time.sleep(self.settle_ms / 1000.0)
+                with log_step(logger, 'camera_grab'):
+                    frame = self.source.grab()
             except BaseException:
                 self._faulted = True
+                self._held = False
                 try:
-                    self.light.turn_off()
+                    with log_step(logger, 'light_turn_off_after_error'):
+                        self.light.turn_off()
                 except Exception:
                     logging.getLogger(__name__).exception("NKLC off failed after capture failure")
                 raise
+            if self._held:
+                logger.info('图像已获取，光源保持常亮')
+                return frame
             try:
-                self.light.turn_off()  # Off failure must not be reported as success.
+                with log_step(logger, 'light_turn_off'):
+                    self.light.turn_off()  # Off failure must not be reported as success.
                 logging.getLogger(__name__).info("图像已获取，光源关灯读回确认")
             except BaseException:
                 self._faulted = True
@@ -221,6 +308,8 @@ class IlluminatedFrameSource:
 
     def close(self):
         with self._lock:
+            self._held = False
+            self._is_open = False
             try:
                 self.light.close()
             finally:

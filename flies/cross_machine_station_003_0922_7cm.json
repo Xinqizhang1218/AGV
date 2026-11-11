@@ -1,0 +1,342 @@
+{
+  "station_id": "station_003",
+  "observation_pose": [
+    -0.5681772232055664,
+    0.8799142241477966,
+    0.3419942259788513,
+    3.141008138656616,
+    -5.369467089622049e-06,
+    0.7737320065498352
+  ],
+  "reference": {
+    "stationId": "station_003",
+    "imagePath": "D:\\data\\station0922_7cm\\station_003\\reference.jpg",
+    "markerId": 2,
+    "corners": [
+      {
+        "id": 0,
+        "x": 688.1163940429688,
+        "y": 956.3433837890625
+      },
+      {
+        "id": 1,
+        "x": 692.03466796875,
+        "y": 764.321533203125
+      },
+      {
+        "id": 2,
+        "x": 695.919189453125,
+        "y": 572.31103515625
+      },
+      {
+        "id": 3,
+        "x": 699.9425659179688,
+        "y": 380.36407470703125
+      },
+      {
+        "id": 4,
+        "x": 880.2479858398438,
+        "y": 960.3819580078125
+      },
+      {
+        "id": 5,
+        "x": 884.0978393554688,
+        "y": 768.4317626953125
+      },
+      {
+        "id": 6,
+        "x": 887.9318237304688,
+        "y": 576.3564453125
+      },
+      {
+        "id": 7,
+        "x": 892.0556640625,
+        "y": 384.5067443847656
+      },
+      {
+        "id": 8,
+        "x": 1072.14501953125,
+        "y": 964.3362426757812
+      },
+      {
+        "id": 9,
+        "x": 1076.1259765625,
+        "y": 772.4716186523438
+      },
+      {
+        "id": 10,
+        "x": 1079.9720458984375,
+        "y": 580.4994506835938
+      },
+      {
+        "id": 11,
+        "x": 1084.04833984375,
+        "y": 388.6754455566406
+      },
+      {
+        "id": 12,
+        "x": 1263.9056396484375,
+        "y": 968.3470458984375
+      },
+      {
+        "id": 13,
+        "x": 1267.9083251953125,
+        "y": 776.608154296875
+      },
+      {
+        "id": 14,
+        "x": 1271.8797607421875,
+        "y": 584.6582641601562
+      },
+      {
+        "id": 15,
+        "x": 1275.8060302734375,
+        "y": 393.0721740722656
+      }
+    ]
+  },
+  "handeye": {
+    "rmseM": 0.00016507846846552216,
+    "sampleCount": 70,
+    "pose3d": {
+      "version": 1,
+      "cameraMatrix": [
+        [
+          4735.589722563242,
+          0.0,
+          1192.4027112559334
+        ],
+        [
+          0.0,
+          4736.0820041318875,
+          1033.0845231513094
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "distCoeffs": [
+        -0.02204750689143773,
+        -0.9998825537591687,
+        -0.00048383978888166395,
+        -0.00013056279294400018,
+        8.373978931657172
+      ],
+      "gTc": [
+        [
+          -0.7052089355145024,
+          -0.7089453814837371,
+          -0.008763751672721462,
+          -0.07587904907133805
+        ],
+        [
+          0.7089986514757064,
+          -0.705134526330979,
+          -0.010305919736554356,
+          -0.06553428549531706
+        ],
+        [
+          0.0011267103145456009,
+          -0.013481314804740838,
+          0.9999084881502919,
+          0.103683074460201
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "imageSize": [
+        2448,
+        2048
+      ],
+      "handEyeMethod": "PARK",
+      "cameraCalibrationRmsPx": 0.06693249502931467
+    },
+    "source": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212\\handeye_result.json",
+    "usage_notes": [
+      "Selection sensitivity remains. Held-out errors are internal fixed-board consistency, not independently measured physical accuracy; additional rotations did not improve held-out orientation error.",
+      "Same camera mounting, focus, robot reported frame required; recollect station reference with these intrinsics."
+    ]
+  },
+  "vision_base_url": "http://127.0.0.1:8088",
+  "vision_response_pose_mode": "delta",
+  "vision_image_dir": "D:/data/station0922_7cm",
+  "motion": {
+    "plc_ip": "192.168.1.88",
+    "plc_port": 502,
+    "plc_timeout_seconds": 3.0,
+    "motion_timeout_seconds": 120.0,
+    "return_timeout_seconds": 120.0,
+    "poll_seconds": 0.1,
+    "position_tolerance_m": 0.0005,
+    "orientation_tolerance_deg": 0.2,
+    "arrival_stable_seconds": 0.5,
+    "return_stable_seconds": 0.5,
+    "photo_hold_seconds": 2.0,
+    "pose_verify_timeout_seconds": 3.0,
+    "expected_return_pose": null,
+    "start_task_single_pose_confirmed": false
+  },
+  "convergence": {
+    "max_corrections": 1,
+    "max_residual_position_m": 0.0005,
+    "max_residual_orientation_deg": 0.2,
+    "required_consecutive_passes": 2,
+    "verification_interval_seconds": 0.5,
+    "damping": 1.0
+  },
+  "safety": {
+    "max_step_translation_m": 0.05,
+    "max_step_orientation_deg": 10.0,
+    "max_total_translation_m": 0.08,
+    "max_total_orientation_deg": 15.0,
+    "workspace_limits_m": {
+      "x": [
+        -1,
+        1
+      ],
+      "y": [
+        -1,
+        1
+      ],
+      "z": [
+        -1,
+        1
+      ]
+    },
+    "orientation_limits_rad": {
+      "rx": [
+        -3,
+        6
+      ],
+      "ry": [
+        -3,
+        6
+      ],
+      "rz": [
+        0,
+        6
+      ]
+    }
+  },
+  "schema_version": 1,
+  "created_at": "2026-09-22T11:10:46",
+  "reference_capture": {
+    "capture_mode": "idle_current_pose_no_motion",
+    "actual_pose_before": [
+      -0.5681772232055664,
+      0.8799142241477966,
+      0.3419942259788513,
+      3.141008138656616,
+      -5.369467089622049e-06,
+      0.7737320065498352
+    ],
+    "actual_pose_after": [
+      -0.5681772232055664,
+      0.8799142241477966,
+      0.3419942259788513,
+      3.141008138656616,
+      -5.369467089622049e-06,
+      0.7737320065498352
+    ],
+    "image_path": "D:/data/station0922_7cm/station_003/reference.jpg",
+    "capture_validation": "continuous_plc_polling_not_hardware_synchronized",
+    "raw_response": {
+      "code": 0,
+      "msg": "跨机台标定完成",
+      "data": {
+        "stationId": "station_003",
+        "imagePath": "D:\\data\\station0922_7cm\\station_003\\reference.jpg",
+        "markerId": 2,
+        "corners": [
+          {
+            "id": 0,
+            "x": 688.1163940429688,
+            "y": 956.3433837890625
+          },
+          {
+            "id": 1,
+            "x": 692.03466796875,
+            "y": 764.321533203125
+          },
+          {
+            "id": 2,
+            "x": 695.919189453125,
+            "y": 572.31103515625
+          },
+          {
+            "id": 3,
+            "x": 699.9425659179688,
+            "y": 380.36407470703125
+          },
+          {
+            "id": 4,
+            "x": 880.2479858398438,
+            "y": 960.3819580078125
+          },
+          {
+            "id": 5,
+            "x": 884.0978393554688,
+            "y": 768.4317626953125
+          },
+          {
+            "id": 6,
+            "x": 887.9318237304688,
+            "y": 576.3564453125
+          },
+          {
+            "id": 7,
+            "x": 892.0556640625,
+            "y": 384.5067443847656
+          },
+          {
+            "id": 8,
+            "x": 1072.14501953125,
+            "y": 964.3362426757812
+          },
+          {
+            "id": 9,
+            "x": 1076.1259765625,
+            "y": 772.4716186523438
+          },
+          {
+            "id": 10,
+            "x": 1079.9720458984375,
+            "y": 580.4994506835938
+          },
+          {
+            "id": 11,
+            "x": 1084.04833984375,
+            "y": 388.6754455566406
+          },
+          {
+            "id": 12,
+            "x": 1263.9056396484375,
+            "y": 968.3470458984375
+          },
+          {
+            "id": 13,
+            "x": 1267.9083251953125,
+            "y": 776.608154296875
+          },
+          {
+            "id": 14,
+            "x": 1271.8797607421875,
+            "y": 584.6582641601562
+          },
+          {
+            "id": 15,
+            "x": 1275.8060302734375,
+            "y": 393.0721740722656
+          }
+        ]
+      },
+      "timestamp": 1790046646444
+    }
+  }
+}

@@ -46,7 +46,7 @@ def build_parser():
     parser.add_argument("--return-profile", type=Path,
                         default=TOOLS_DIR / "cross_machine_station_001.json")
     parser.add_argument("--profile", type=Path,
-                        default=PROJECT_DIR / "cross_machine_station_002_09212.json")
+                        default=PROJECT_DIR / "tools/cross_machine_station_004_0923_15cm_4cm.json")
     parser.add_argument("--handeye-json", type=Path,
                         default=TOOLS_DIR / "capture_images6cm09212/handeye_api.json")
     parser.add_argument("--cycles", type=int, default=30)

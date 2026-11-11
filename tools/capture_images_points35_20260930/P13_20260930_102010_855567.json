@@ -1,0 +1,60 @@
+{
+  "point_name": "P13",
+  "image": "P13_20260930_102010_855567.jpg",
+  "units": {
+    "position": "m",
+    "orientation": "rad"
+  },
+  "orientation_convention": "Rz*Ry*Rx",
+  "points_source": "points_35_integer_candidate.xlsx / points_35_relative_P01_mm_deg!A2:G36",
+  "base_pose": [
+    -0.4613124,
+    0.00933142,
+    0.5292436,
+    -3.1409895,
+    -3.11e-06,
+    0.75732857
+  ],
+  "offset_mm_deg": [
+    -2,
+    38,
+    0,
+    -6,
+    0,
+    0
+  ],
+  "offset_convention": "base_frame_xyz_plus_euler_component_offsets",
+  "target_pose": [
+    -0.4633124,
+    0.04733142,
+    0.5292436,
+    -3.24570925511966,
+    -3.11e-06,
+    0.75732857
+  ],
+  "actual_pose_before": [
+    -0.46331340074539185,
+    0.047332361340522766,
+    0.5292455554008484,
+    3.037475824356079,
+    -1.0608021057123551e-06,
+    0.7573298215866089
+  ],
+  "actual_pose_after": [
+    -0.46331340074539185,
+    0.047332361340522766,
+    0.5292455554008484,
+    3.037475824356079,
+    -1.0608021057123551e-06,
+    0.7573298215866089
+  ],
+  "time_before": "2026-09-30T10:20:10.855567",
+  "time_after": "2026-09-30T10:20:11.025211",
+  "frame": {
+    "nFrameNum": 477,
+    "nDevTimeStampHigh": 2,
+    "nDevTimeStampLow": 3417975834,
+    "nHostTimeStamp": 1790734810874
+  },
+  "validation": "before_after_checks_not_hardware_synchronized"
+}

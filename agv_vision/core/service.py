@@ -17,7 +17,8 @@ from agv_vision.core.offline_source import OfflineImageSource  # 导入离线图
 from agv_vision.core.orbbec_source import OrbbecColorSource  # 导入奥比中光在线相机源
 from agv_vision.core.daheng_source import DahengColorSource
 from agv_vision.core.hikvision_source import HikvisionColorSource
-from agv_vision.core.nodka_light import NodkaLight, IlluminatedFrameSource
+from agv_vision.core.nodka_light import NodkaLight, IlluminatedFrameSource, LightStatusError
+from agv_vision.core.exceptions import SourceError
 from agv_vision.vision.charuco_detector import CharucoBoardDetector  # Charuco 检测器
 from agv_vision.vision.aruco_detector import ArucoReferenceDetector  # Aruco 检测器
 from agv_vision.vision.handeye_calibrator import PlanarHandEyeCalibrator  # 手眼标定器
@@ -26,6 +27,16 @@ from agv_vision.utils.timing import log_step, timed_operation
 from agv_vision.utils.time_utils import now_str, today_str  # 时间字符串生成工具，用于文件名
 
 class AGVVisionService:  # 定义 AGV 视觉服务类
+    def control_light(self, action: str) -> None:
+        if not isinstance(self.source, IlluminatedFrameSource):
+            raise SourceError('当前模式未启用在线光源控制')
+        self.source.control_light(action)
+
+    def get_light_status(self) -> dict:
+        if not isinstance(self.source, IlluminatedFrameSource):
+            raise LightStatusError('当前模式未启用在线光源控制', False)
+        return self.source.get_light_status()
+
     def __init__(self, settings: AppSettings, logger):  # 初始化函数
         self.settings = settings  # 保存应用配置对象
         self.logger = logger  # 保存日志对象

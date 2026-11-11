@@ -45,7 +45,35 @@ def build_parser() -> argparse.ArgumentParser:  # 定义命令行参数解析器
     comp.add_argument('--scenario', default=None)  # 添加参数 --scenario，可选，用于离线模式切换场景
 
     return parser  # 返回构建好的参数解析器
+# 我的 AGV 程序允许用户怎么操作？
 
+# 请选择功能：
+
+# 1. serve
+#    → 启动 HTTP 服务
+
+# 2. capture
+#    → 拍一张照片
+
+# 3. capture-handeye-sample
+#    → 采集手眼样本
+#    → 你还必须告诉我：
+#       sample-id
+#       robot-x-m
+#       robot-y-m
+
+# 4. solve-handeye
+#    → 求解手眼标定
+#    → 你还要告诉我 samples-json
+
+# 5. batch-capture-handeye
+#    → 批量采集
+
+# 6. collect-reference
+#    → 采集工位基准
+
+# 7. compensate
+#    → 做二次补偿
 
 def main() -> None:  # 定义主函数
     parser = build_parser()  # 构建命令行参数解析器

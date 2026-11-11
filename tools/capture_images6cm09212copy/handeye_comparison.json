@@ -1,0 +1,145 @@
+{
+  "batches": [
+    {
+      "source_directory": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212",
+      "sample_count": 70,
+      "calibration_rms_px": 0.06693249502931467,
+      "translation_mm": [
+        -75.87904907133804,
+        -65.53428549531706,
+        103.683074460201
+      ],
+      "quality": {
+        "full_16_corner_samples": 58,
+        "partial_8_to_15_corner_samples": 12,
+        "max_capture_motion_mm": 0.0015617400015382461,
+        "max_capture_motion_deg": 0.00017527538371813663,
+        "board_saturated_pct_median": 1.3556578363388583,
+        "board_saturated_pct_max": 14.018264959293816
+      },
+      "held_out_metrics": {
+        "position_rms_mm": 0.17558791618093225,
+        "position_p95_mm": 0.2898650149200637,
+        "position_max_mm": 0.4403242668757678,
+        "rotation_rms_deg": 0.07970918855642285,
+        "rotation_max_deg": 0.288653658474736,
+        "max_subset_translation_difference_mm": 0.799690431549443
+      },
+      "training_position_rms_mm": 0.16507846846552215
+    },
+    {
+      "source_directory": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212copy",
+      "sample_count": 70,
+      "calibration_rms_px": 0.06693215879674606,
+      "translation_mm": [
+        -75.71473125539201,
+        -65.65123262623196,
+        103.82136505845357
+      ],
+      "quality": {
+        "corner_counts": [
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          12,
+          16,
+          12,
+          16,
+          16,
+          16,
+          16,
+          16,
+          16,
+          12,
+          9,
+          8,
+          12,
+          9,
+          12,
+          11,
+          9,
+          14,
+          14
+        ],
+        "corner_hull_coverage_fraction": 0.5884951749323454,
+        "corner_bounds_px": [
+          [
+            218.62303161621094,
+            294.1943664550781
+          ],
+          [
+            2225.394287109375,
+            1811.8994140625
+          ]
+        ],
+        "board_saturated_pct_median": 0.018811735716840965,
+        "board_saturated_pct_max": 18.299357872840734
+      },
+      "held_out_metrics": {
+        "position_rms_mm": 0.1914570890971528,
+        "position_p95_mm": 0.2885603034735435,
+        "position_max_mm": 0.6901574278852608,
+        "rotation_rms_deg": 0.09466261244061283,
+        "rotation_max_deg": 0.5802655972875834,
+        "max_subset_translation_difference_mm": 0.9834196752570952
+      },
+      "training_position_rms_mm": 0.17070957555485308
+    }
+  ],
+  "new_batch_transform_differences": [
+    {
+      "reference": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212",
+      "translation_mm": 0.24454297297520983,
+      "rotation_deg": 0.05583015411776329
+    }
+  ],
+  "warning": "Within-batch held-out consistency is not independent physical accuracy; transforms require same mounting and robot reported frame."
+}

@@ -1,0 +1,69 @@
+{
+  "rmseM": 0.00015695396265406566,
+  "sampleCount": 30,
+  "pose3d": {
+    "version": 1,
+    "cameraMatrix": [
+      [
+        4738.0583806583045,
+        0.0,
+        1196.1018208302596
+      ],
+      [
+        0.0,
+        4738.691815276259,
+        1030.974884952531
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distCoeffs": [
+      -0.013774727244417704,
+      -1.367026490876005,
+      -0.0006142623644344053,
+      8.584790049930078e-05,
+      12.897182711489814
+    ],
+    "gTc": [
+      [
+        -0.7049731437732163,
+        -0.7091772041419131,
+        -0.008975504663698466,
+        -0.07619492503025134
+      ],
+      [
+        0.7092334818091885,
+        -0.7049008784340618,
+        -0.010130146282434527,
+        -0.0654491830224116
+      ],
+      [
+        0.0008572276962951486,
+        -0.013507209495240244,
+        0.9999084060314368,
+        0.10361404238178544
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "imageSize": [
+      2448,
+      2048
+    ],
+    "handEyeMethod": "PARK",
+    "cameraCalibrationRmsPx": 0.06750535441638146
+  },
+  "source": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212\\subset_30_match70\\handeye_result.json",
+  "usage_notes": [
+    "Subset selected to approximate full70; closeness is not independent accuracy.",
+    "Camera intrinsics differ: recollect reference with this calibration before cross-machine use.",
+    "Robot reported frame: verify TCP/flange definition."
+  ]
+}

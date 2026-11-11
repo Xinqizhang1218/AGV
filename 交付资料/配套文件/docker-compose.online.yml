@@ -1,0 +1,33 @@
+services:
+  agv-vision-pkg5-online:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: agv-vision-pkg5-online
+    restart: unless-stopped
+    network_mode: host
+
+    environment:
+      TZ: Asia/Shanghai
+      PYTHONUNBUFFERED: "1"
+
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./outputs:/app/outputs
+      - /home/projects:/home/projects:z
+      - ./agv_vision/config/settings_online.yaml:/app/agv_vision/config/settings_online.yaml:ro
+
+    command: >
+      python -m agv_vision.main
+      --config agv_vision/config/settings_online.yaml
+      serve
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # 如果使用 USB 相机，再根据实际情况启用：
+    # privileged: true
+    # devices:
+    #   - "/dev/bus/usb:/dev/bus/usb"

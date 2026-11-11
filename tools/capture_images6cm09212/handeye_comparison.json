@@ -1,0 +1,78 @@
+{
+  "batches": [
+    {
+      "source_directory": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212",
+      "sample_count": 70,
+      "calibration_rms_px": 0.06693249502931467,
+      "translation_mm": [
+        -75.87904907133804,
+        -65.53428549531706,
+        103.683074460201
+      ],
+      "quality": {
+        "full_16_corner_samples": 58,
+        "partial_8_to_15_corner_samples": 12,
+        "max_capture_motion_mm": 0.0015617400015382461,
+        "max_capture_motion_deg": 0.00017527538371813663,
+        "board_saturated_pct_median": 1.3556578363388583,
+        "board_saturated_pct_max": 14.018264959293816
+      },
+      "held_out_metrics": {
+        "position_rms_mm": 0.17558791618093225,
+        "position_p95_mm": 0.2898650149200637,
+        "position_max_mm": 0.4403242668757678,
+        "rotation_rms_deg": 0.07970918855642285,
+        "rotation_max_deg": 0.288653658474736,
+        "max_subset_translation_difference_mm": 0.799690431549443
+      },
+      "training_position_rms_mm": 0.16507846846552215
+    }
+  ],
+  "new_batch_transform_differences": [],
+  "within_batch_subsets": [
+    {
+      "name": "all_eligible",
+      "sample_count": 70,
+      "calibration_rms_px": 0.06693249502931467,
+      "held_out_metrics": {
+        "position_rms_mm": 0.17558791618093225,
+        "position_p95_mm": 0.2898650149200637,
+        "position_max_mm": 0.4403242668757678,
+        "rotation_rms_deg": 0.07970918855642285,
+        "rotation_max_deg": 0.288653658474736,
+        "max_subset_translation_difference_mm": 0.799690431549443
+      }
+    },
+    {
+      "name": "full_corners",
+      "sample_count": 58,
+      "calibration_rms_px": 0.06421056611793256,
+      "held_out_metrics": {
+        "position_rms_mm": 0.19140889082578302,
+        "position_p95_mm": 0.28480760360970214,
+        "position_max_mm": 0.4707390831298357,
+        "rotation_rms_deg": 0.05753408568312131,
+        "rotation_max_deg": 0.13390094108501385,
+        "max_subset_translation_difference_mm": 0.9108024356316348
+      }
+    },
+    {
+      "name": "original_50",
+      "sample_count": 50,
+      "calibration_rms_px": 0.06373932737740602,
+      "held_out_metrics": {
+        "position_rms_mm": 0.19145453677198654,
+        "position_p95_mm": 0.27247865560661644,
+        "position_max_mm": 0.46480462747983176,
+        "rotation_rms_deg": 0.05675669952446829,
+        "rotation_max_deg": 0.14938160108167636,
+        "max_subset_translation_difference_mm": 0.8346404080067698
+      }
+    }
+  ],
+  "subset_sensitivity": {
+    "full_corners_translation_difference_mm": 1.732242491225084,
+    "full_corners_rotation_difference_deg": 0.07111823959907755
+  },
+  "warning": "Selection sensitivity remains. Held-out errors are internal fixed-board consistency, not independently measured physical accuracy; additional rotations did not improve held-out orientation error."
+}

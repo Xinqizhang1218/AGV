@@ -1,0 +1,296 @@
+# =====================================================
+# 系统运行模式
+# online  = 在线模式（真实相机）
+# offline = 离线模式（读取本地图片）
+# =====================================================
+mode: online
+
+
+# =====================================================
+# 相机配置
+# =====================================================
+camera:
+
+  # 可选：orbbec / daheng / hikvision
+  vendor: hikvision
+
+  # 每个厂商使用自己的分辨率和帧率。
+  orbbec:
+    width: 1280
+    height: 800
+    fps: 15
+
+  # installer_path 是安装包位置，程序不会自动执行安装程序。
+  # SDK 安装后，若 Python 仍无法 import，请把实际 Python 包目录填入 python_path。
+  daheng:
+    installer_path: null
+    python_path: '/app/SDK/GalaxySDK/Development/Samples/Python'
+    serial_number: null
+    ip_address: 192.168.1.101
+    width: 2448
+    height: 2048
+    fps: 15
+
+  hikvision:
+    installer_path: null
+    python_path: "SDK/MvImport"  # 对应 pkg5_260728/SDK/MvImport；在项目根目录启动，Linux 另需 MVS 运行库。
+    serial_number: null
+    ip_address: 192.168.1.118
+    width: 2448
+    height: 2048
+    fps: 15
+
+  width: 1280              # 旧配置兼容兜底；优先使用厂商配置块。
+
+  height: 800              # 旧配置兼容兜底；优先使用厂商配置块。
+
+  fps: 15                  # 旧配置兼容兜底；优先使用厂商配置块。
+
+  enable_depth: false      # 是否开启深度图（双目深度相机可用）
+
+  timeout_ms: 5000         # 单次取图超时（毫秒）；光源拍照失败后需检查并重启，不自动重拍。
+
+  prefer_format: MJPG      # 图像格式（MJPG压缩格式）
+
+  ip_address: 192.168.1.101  # 仅 Orbbec；大恒、海康使用各自配置块中的地址
+
+  control_port: 8090        # 仅 Orbbec 网络相机使用
+
+  # serial_number: CPEP1630003E  # 指定相机序列号，多相机时使用
+
+  serial_number: null        # 当前 USB Orbbec Gemini 305 序列号
+
+  auto_exposure: false      # 光源联动拍照使用固定曝光，必须关闭自动曝光。
+
+  exposure: 10000            # 海康单位微秒，10000 = 10 毫秒；按实拍亮度调整。
+
+  gain: null               # 增益值（提高亮度但会增加噪点）
+
+  auto_white_balance: true # 自动白平衡
+
+  white_balance: null      # 手动白平衡值
+
+  # 大恒 MER3-501-59G3C-P + HN-0816-5M-C2/3X（8 mm）固定内参。
+  # 修改镜头、对焦、ROI、binning 或分辨率后必须重新标定。
+  # intrinsics:
+  #   enabled: true
+  #   image_size: [2448, 2048]
+  #   camera_matrix:
+  #     - [2318.84, 0.0, 1224.0]
+  #     - [0.0, 2318.84, 1024.0]
+  #     - [0.0, 0.0, 1.0]
+  #   dist_coeffs: [-0.2071189236, 0.1173680146, 0.0, 0.0, 0.0]
+  #   calibration_rms_px: 1.058
+  #   source: '8mm lens + 3.45um pixel pitch; distortion fitted from p01-p30'
+  intrinsics:
+    enabled: false #采集 ChArUco 图片后，在执行标定求解时计算内参和畸变，并不是连接相机后自动获取。
+    image_size: [2448, 2048]
+    camera_matrix:
+      - [2347.8142312772247, 0.0, 1224.0]
+      - [0.0, 2347.8142312772247, 1024.0]
+      - [0.0, 0.0, 1.0]
+    dist_coeffs: [-0.1864287034881238, 0.10125535169654565, 0.0, 0.0, 0.0]
+    calibration_rms_px:  0.827005167352833
+    source: '8mm lens + 3.45um pixel pitch; distortion fitted from p01-p30'
+
+
+# =====================================================
+# 离线模式配置
+# =====================================================
+offline:
+
+  scenario: station_reference   # 当前离线场景名称
+
+  base_dir: examples/offline_images  # 离线图片根目录
+
+  loop: true                    # 图片是否循环读取
+
+  supported_suffixes:           # 支持的图片格式
+    - '.jpg'
+    - '.jpeg'
+    - '.png'
+    - '.bmp'
+
+
+
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.020
+#   marker_length_m: 0.150
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+# 手眼采样与标定专用；长度单位：米。
+# 备用 ChArUco 标定板（全部注释，暂不启用）
+# 来源：标定版目录内三份 CHARUCO_DICT_4X4 铝板 V1 图纸（2026/09/04）。
+# 长度单位为米；squares_x/y 是格子数，不是内角点数。
+# 图纸仅注明 DICT_4X4，以下沿用当前 DICT_4X4_50，启用前需核对字典及 ID 排列。
+# 检测参数沿用当前配置；将备选参数填入对应的新配置块，勿直接取消 charuco 注释。
+#
+# 方案一：50x50x3 mm 铝板，图案 40x40 mm，格子 8 mm，标记 5.333 mm。
+# 来源文件：CHARUCO_DICT_4X4铝板-50x50x3mm-8-V1.pdf
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.008
+#   marker_length_m: 0.005333
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+#
+# 方案二：60x60x3 mm 铝板，图案 50x50 mm，格子 10 mm，标记 6.667 mm。
+# 来源文件：CHARUCO_DICT_4X4铝板-60x60x3mm-10-V1.pdf
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.010
+#   marker_length_m: 0.006667
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+#
+# 方案三：70x70x3 mm 铝板，图案 60x60 mm，格子 12 mm，标记 8 mm。
+# 来源文件：CHARUCO_DICT_4X4铝板-70x70x3mm-12-V1.pdf
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.012
+#   marker_length_m: 0.008
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+# =====================================================
+
+handeye_charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  square_length_m: 0.030
+  marker_length_m: 0.022
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+
+# 工位基准与二次补偿专用；更换板规格后必须重新采集工位基准。
+station_charuco:
+  dictionary_name: DICT_4X4_50
+  squares_x: 5
+  squares_y: 5
+  #7cm板子
+  # square_length_m: 0.012
+  # marker_length_m: 0.008
+  #6cm板子
+  # square_length_m: 0.010
+  # marker_length_m: 0.006667
+  #5cm板子
+  # square_length_m: 0.008 
+  # marker_length_m: 0.005333
+  #4cm板子
+  square_length_m: 0.006 
+  marker_length_m: 0.004 
+  min_corners: 5
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+  use_subpix: true
+
+# charuco:
+#   dictionary_name: DICT_4X4_50
+#   squares_x: 5
+#   squares_y: 5
+#   square_length_m: 0.008
+#   marker_length_m: 0.0056
+#   min_corners: 5
+#   adaptive_thresh_constant: 7.0
+#   min_marker_perimeter_rate: 0.015
+#   max_marker_perimeter_rate: 4.0
+#   use_subpix: true
+
+# =====================================================
+# Aruco 定位码参数（工位定位使用）
+# =====================================================
+aruco:
+
+  dictionary_name: DICT_5X5_50
+  marker_length_m: 0.150
+  marker_ids:
+    - 0
+  preferred_origin_id: 0
+  pixels_per_m_fallback: 3000.0
+  min_markers: 1
+  adaptive_thresh_constant: 7.0
+  min_marker_perimeter_rate: 0.015
+  max_marker_perimeter_rate: 4.0
+
+
+cross_calibration:
+  target_type: charuco  # 使用整板 ChArUco 跨机台基准
+  charuco_marker_id: 2
+
+# 六自由度补偿安全阈值；超过阈值时接口拒绝返回可执行目标位姿
+compensation:
+  max_translation_m: 0.05
+  max_rotation_rad: 0.5
+
+
+# =====================================================
+# 后端系统配置
+# =====================================================
+backend:
+
+  enabled: false                 # 是否启用真实后端接口
+
+  base_url: http://127.0.0.1:9000  # 后端地址
+
+  timeout_sec: 5.0              # 超时时间（秒）
+
+
+# =====================================================
+# 调试配置
+# =====================================================
+debug:
+
+  save_debug_images: true       # 保存调试图像
+
+  debug_dir: data/debug         # 调试图目录
+
+  log_dir: logs                 # 日志目录
+
+  save_result_json: true        # 保存识别结果JSON
+
+
+# =====================================================
+# FastAPI 服务配置
+# =====================================================
+service:
+
+
+  host: 0.0.0.0                # 所有网卡可访问
+
+  port: 8088                   # 服务端口，按后端接口文档默认心跳/服务端口
+
+# 光源控制配置
+light:
+  enabled: true
+  library_path: third_party/nodka/lib/libagv_nodka_light.so
+  config_path: third_party/nodka/config/nkio_config.ini
+  port: 3  # NP-6133-MVS 实机已验证
+  channel_mask: 1  # 机箱 CH1 = SDK CH0 = 0x01，实机已确认亮灯
+  brightness: 50  # 0～100；机箱 CH1 已实测此亮度能亮灯。
+  settle_ms: 1000  # 开灯后等待毫秒数；每张图取完关灯，手眼整组常亮尚未实现。
+

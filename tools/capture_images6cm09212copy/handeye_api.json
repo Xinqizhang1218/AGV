@@ -1,0 +1,69 @@
+{
+  "rmseM": 0.00017070957555485308,
+  "sampleCount": 70,
+  "pose3d": {
+    "version": 1,
+    "cameraMatrix": [
+      [
+        4735.588336438772,
+        0.0,
+        1192.4028222374648
+      ],
+      [
+        0.0,
+        4736.080589684795,
+        1033.0855963786137
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "distCoeffs": [
+      -0.022046336630417374,
+      -0.9999231079773265,
+      -0.0004837670784539841,
+      -0.00013054690252991945,
+      8.374623349632303
+    ],
+    "gTc": [
+      [
+        -0.7047523810899863,
+        -0.7093918197764537,
+        -0.009344912104835797,
+        -0.075714731255392
+      ],
+      [
+        0.7094532545384943,
+        -0.7046836789262078,
+        -0.009848465858489808,
+        -0.06565123262623196
+      ],
+      [
+        0.0004012140760824359,
+        -0.013570508070006152,
+        0.9999078359218865,
+        0.10382136505845356
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "imageSize": [
+      2448,
+      2048
+    ],
+    "handEyeMethod": "PARK",
+    "cameraCalibrationRmsPx": 0.06693215879674606
+  },
+  "source": "D:\\code\\AGV\\pkg5_260728\\tools\\capture_images6cm09212copy\\handeye_result.json",
+  "usage_notes": [
+    "Candidate, not independently validated positioning accuracy.",
+    "gTc is relative to the robot frame reported during calibration. Online currentFlangePose must refer to that SAME frame; otherwise convert TCP/flange first.",
+    "Requires original camera, lens, mounting, focus and matching image geometry."
+  ]
+}

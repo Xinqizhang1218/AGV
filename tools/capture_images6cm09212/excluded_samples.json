@@ -1,0 +1,211 @@
+[
+  {
+    "point": "P51",
+    "image": "P51_20260921_110551_816609.jpg",
+    "metadata": "P51_20260921_110551_816609.json",
+    "corner_count": 16,
+    "reason": "duplicate point; first eligible capture retained",
+    "category": "duplicates",
+    "image_sha256": "fc50a38b4f2230b1c2af76495ec46ad374d5a10ad0a8cbdd3680e5d985dbe559",
+    "image_quarantine_path": "_excluded\\duplicates\\P51_20260921_110551_816609.jpg",
+    "metadata_quarantine_path": "_excluded\\duplicates\\P51_20260921_110551_816609.json"
+  },
+  {
+    "point": "P54",
+    "image": "P54_20260921_110956_291776.jpg",
+    "metadata": "P54_20260921_110956_291776.json",
+    "corner_count": 12,
+    "reason": "duplicate point; first eligible capture retained",
+    "category": "duplicates",
+    "image_sha256": "cb9bc727b347f8e1dd952780a6719e222b316040280891e40cc14ffd2e8060c7",
+    "image_quarantine_path": "_excluded\\duplicates\\P54_20260921_110956_291776.jpg",
+    "metadata_quarantine_path": "_excluded\\duplicates\\P54_20260921_110956_291776.json"
+  },
+  {
+    "point": "P54",
+    "image": "P54_20260921_111059_246584.jpg",
+    "metadata": "P54_20260921_111059_246584.json",
+    "corner_count": 12,
+    "reason": "duplicate point; first eligible capture retained",
+    "category": "duplicates",
+    "image_sha256": "ca74f613f8c9afaace8417f68993cd88b2a6dbc2fa865b38dd0b02b3bdb2fb2d",
+    "image_quarantine_path": "_excluded\\duplicates\\P54_20260921_111059_246584.jpg",
+    "metadata_quarantine_path": "_excluded\\duplicates\\P54_20260921_111059_246584.json"
+  },
+  {
+    "point": "P57",
+    "image": "P57_20260921_111122_723670.jpg",
+    "metadata": "P57_20260921_111122_723670.json",
+    "corner_count": 6,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "2449abbcc4314d616e9819615c31e3499e7c434d20aeaa07c5ff91c5998682f6",
+    "image_quarantine_path": "_excluded\\invalid\\P57_20260921_111122_723670.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P57_20260921_111122_723670.json"
+  },
+  {
+    "point": "P58",
+    "image": "P58_20260921_111150_108722.jpg",
+    "metadata": "P58_20260921_111150_108722.json",
+    "corner_count": 6,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "41c2c8bc0ca8c5c443a731e447f9d1b45b51824683cde9075e0af7d1b05a537c",
+    "image_quarantine_path": "_excluded\\invalid\\P58_20260921_111150_108722.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P58_20260921_111150_108722.json"
+  },
+  {
+    "point": "P59",
+    "image": "P59_20260921_111227_049286.jpg",
+    "metadata": "P59_20260921_111227_049286.json",
+    "corner_count": 6,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "ba3a1c4b55c8b9892db5c6ae75ff372ec3a8fef4ae5fab451ddf6225540a5f6f",
+    "image_quarantine_path": "_excluded\\invalid\\P59_20260921_111227_049286.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P59_20260921_111227_049286.json"
+  },
+  {
+    "point": "P60",
+    "image": "P60_20260921_111239_292237.jpg",
+    "metadata": "P60_20260921_111239_292237.json",
+    "corner_count": 6,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "ff8d53a9edc99c1b51848e796a8915249721e7ddfe5279b5fb87c695dc5eb819",
+    "image_quarantine_path": "_excluded\\invalid\\P60_20260921_111239_292237.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P60_20260921_111239_292237.json"
+  },
+  {
+    "point": "P63",
+    "image": "P63_20260921_111344_313470.jpg",
+    "metadata": "P63_20260921_111344_313470.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "4a50fb0fdd1271cc3b7c10f8df294fbd403655d3b1cf3bdf2ea0cfb87b55b7e1",
+    "image_quarantine_path": "_excluded\\invalid\\P63_20260921_111344_313470.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P63_20260921_111344_313470.json"
+  },
+  {
+    "point": "P64",
+    "image": "P64_20260921_111407_293067.jpg",
+    "metadata": "P64_20260921_111407_293067.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "b6b374f6945879b10c2dd48bf20eb23d11707e1922868bd79c631ccd1e39b247",
+    "image_quarantine_path": "_excluded\\invalid\\P64_20260921_111407_293067.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P64_20260921_111407_293067.json"
+  },
+  {
+    "point": "P65",
+    "image": "P65_20260921_111418_747955.jpg",
+    "metadata": "P65_20260921_111418_747955.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "c989cabe8fb0bfd81b3bb1511290897fd09cf023e916017622688a4a35d92e92",
+    "image_quarantine_path": "_excluded\\invalid\\P65_20260921_111418_747955.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P65_20260921_111418_747955.json"
+  },
+  {
+    "point": "P66",
+    "image": "P66_20260921_111431_473790.jpg",
+    "metadata": "P66_20260921_111431_473790.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "97ed9026a36bee8aad56924dd7799307876dad0fb6fb62d720e9b6fefd00189a",
+    "image_quarantine_path": "_excluded\\invalid\\P66_20260921_111431_473790.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P66_20260921_111431_473790.json"
+  },
+  {
+    "point": "P69",
+    "image": "P69_20260921_111505_193586.jpg",
+    "metadata": "P69_20260921_111505_193586.json",
+    "corner_count": 4,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "ad43991b0f3dd10f14b61c15383da8e2d82ba3b3476711ff5789ceb5def63673",
+    "image_quarantine_path": "_excluded\\invalid\\P69_20260921_111505_193586.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P69_20260921_111505_193586.json"
+  },
+  {
+    "point": "P70",
+    "image": "P70_20260921_111516_603103.jpg",
+    "metadata": "P70_20260921_111516_603103.json",
+    "corner_count": 4,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "7ea6a32342d38c618636b7671805440be751395315b45d59bb5717767629133f",
+    "image_quarantine_path": "_excluded\\invalid\\P70_20260921_111516_603103.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P70_20260921_111516_603103.json"
+  },
+  {
+    "point": "P71",
+    "image": "P71_20260921_111529_264872.jpg",
+    "metadata": "P71_20260921_111529_264872.json",
+    "corner_count": 4,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "1948a4d6dc80a7405a1ec8db7c7dcb206661e70ea77cac04cd9f229ea078ec56",
+    "image_quarantine_path": "_excluded\\invalid\\P71_20260921_111529_264872.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P71_20260921_111529_264872.json"
+  },
+  {
+    "point": "P72",
+    "image": "P72_20260921_111542_200145.jpg",
+    "metadata": "P72_20260921_111542_200145.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "07edbc04af53b581eda6129590eb829c27a9385a243574f5ec40d61013fff30c",
+    "image_quarantine_path": "_excluded\\invalid\\P72_20260921_111542_200145.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P72_20260921_111542_200145.json"
+  },
+  {
+    "point": "P81",
+    "image": "P81_20260921_111746_382690.jpg",
+    "metadata": "P81_20260921_111746_382690.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "601571c7171a188c2b14bd1e7baa351163d59137bfd64a8578ff19be272b1e55",
+    "image_quarantine_path": "_excluded\\invalid\\P81_20260921_111746_382690.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P81_20260921_111746_382690.json"
+  },
+  {
+    "point": "P82",
+    "image": "P82_20260921_111800_735815.jpg",
+    "metadata": "P82_20260921_111800_735815.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "bc20ec2cf0505cac1a86f4e009ad04b9d138d19686adc72eb5d0b1738db551dc",
+    "image_quarantine_path": "_excluded\\invalid\\P82_20260921_111800_735815.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P82_20260921_111800_735815.json"
+  },
+  {
+    "point": "P83",
+    "image": "P83_20260921_111815_045801.jpg",
+    "metadata": "P83_20260921_111815_045801.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "973386c3ee3f976e4b4c69e3dca148723854eb791538b88b23bea13d87907c48",
+    "image_quarantine_path": "_excluded\\invalid\\P83_20260921_111815_045801.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P83_20260921_111815_045801.json"
+  },
+  {
+    "point": "P84",
+    "image": "P84_20260921_111833_494501.jpg",
+    "metadata": "P84_20260921_111833_494501.json",
+    "corner_count": 0,
+    "reason": "fewer than 8 ChArUco corners",
+    "category": "invalid",
+    "image_sha256": "b9138c90c783c7d8131ff8679c4f37aca0e9f7ef654bc5b8dbcafbdc82850606",
+    "image_quarantine_path": "_excluded\\invalid\\P84_20260921_111833_494501.jpg",
+    "metadata_quarantine_path": "_excluded\\invalid\\P84_20260921_111833_494501.json"
+  }
+]

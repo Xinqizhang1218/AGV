@@ -20,6 +20,8 @@ from agv_vision.backends.client import BackendClient
 from agv_vision.backends.mock_backend import MockBackend
 from agv_vision.config.settings import AppSettings
 from agv_vision.core.service import AGVVisionService
+from agv_vision.core.exceptions import SourceError
+from agv_vision.core.nodka_light import LightStatusError
 from agv_vision.utils.logging_utils import setup_logging
 from agv_vision.vision.compensator import compose_target_flange_pose
 
@@ -708,6 +710,31 @@ def api_health() -> dict:
         'config': str(SETTINGS_PATH),
         'service_port': settings.service.port,
     })
+
+
+@app.post('/api/v1/agv/light/control')
+def api_light_control(body: Any = Body(None)) -> dict:
+    ts = _get_timestamp(body) if isinstance(body, dict) else _now_ms()
+    try:
+        data = body.get('data') if isinstance(body, dict) else None
+        if not isinstance(data, dict) or data.get('action') not in ('on', 'off'):
+            raise ValueError('data.action 仅支持 on 或 off')
+        action = data['action']
+        service.control_light(action)
+        logger.info('光源控制成功 action=%s', action)
+        return _resp_ok({}, msg='开灯成功' if action == 'on' else '关灯成功', timestamp=ts)
+    except (ValueError, SourceError) as exc:
+        logger.exception('api light control failed')
+        return _resp_fail(str(exc), timestamp=ts)
+
+
+@app.get('/api/v1/agv/light/status')
+def api_light_status() -> dict:
+    try:
+        return _resp_ok(service.get_light_status())
+    except LightStatusError as exc:
+        logger.exception('api light status failed')
+        return _resp_fail(str(exc), data=exc.status)
 
 
 @app.post('/api/v1/agv/photo')

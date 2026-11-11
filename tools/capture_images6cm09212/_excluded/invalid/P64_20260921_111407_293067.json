@@ -1,0 +1,42 @@
+{
+  "point_name": "P64",
+  "image": "P64_20260921_111407_293067.jpg",
+  "units": {
+    "position": "m",
+    "orientation": "rad"
+  },
+  "orientation_convention": "Rz*Ry*Rx",
+  "target_pose": [
+    -0.51485,
+    0.00473,
+    0.47268,
+    2.880386,
+    0.0,
+    0.757
+  ],
+  "actual_pose_before": [
+    -0.5148522853851318,
+    0.004730312619358301,
+    0.47268369793891907,
+    2.8803844451904297,
+    2.5716824438859476e-06,
+    0.757000207901001
+  ],
+  "actual_pose_after": [
+    -0.5148522853851318,
+    0.004730312619358301,
+    0.47268369793891907,
+    2.8803844451904297,
+    2.5716824438859476e-06,
+    0.757000207901001
+  ],
+  "time_before": "2026-09-21T11:14:07.293067",
+  "time_after": "2026-09-21T11:14:07.377356",
+  "frame": {
+    "nFrameNum": 52,
+    "nDevTimeStampHigh": 158,
+    "nDevTimeStampLow": 4037949304,
+    "nHostTimeStamp": 1789960447222
+  },
+  "validation": "before_after_checks_not_hardware_synchronized"
+}

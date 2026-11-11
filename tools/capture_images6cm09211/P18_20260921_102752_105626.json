@@ -1,0 +1,42 @@
+{
+  "point_name": "P18",
+  "image": "P18_20260921_102752_105626.jpg",
+  "units": {
+    "position": "m",
+    "orientation": "rad"
+  },
+  "orientation_convention": "Rz*Ry*Rx",
+  "target_pose": [
+    -0.47231,
+    -0.03947,
+    0.45438,
+    -2.943967,
+    0.006519,
+    0.747865
+  ],
+  "actual_pose_before": [
+    -0.4723091721534729,
+    -0.03946983069181442,
+    0.4543794095516205,
+    -2.943964719772339,
+    0.006519089452922344,
+    0.7478689551353455
+  ],
+  "actual_pose_after": [
+    -0.47230908274650574,
+    -0.03946994990110397,
+    0.4543793797492981,
+    -2.9439659118652344,
+    0.006519362796097994,
+    0.7478690147399902
+  ],
+  "time_before": "2026-09-21T10:27:52.105626",
+  "time_after": "2026-09-21T10:27:52.226661",
+  "frame": {
+    "nFrameNum": 1378,
+    "nDevTimeStampHigh": 94,
+    "nDevTimeStampLow": 1401436688,
+    "nHostTimeStamp": 1789957672075
+  },
+  "validation": "before_after_checks_not_hardware_synchronized"
+}

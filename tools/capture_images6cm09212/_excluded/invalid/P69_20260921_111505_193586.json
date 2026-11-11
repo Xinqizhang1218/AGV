@@ -1,0 +1,42 @@
+{
+  "point_name": "P69",
+  "image": "P69_20260921_111505_193586.jpg",
+  "units": {
+    "position": "m",
+    "orientation": "rad"
+  },
+  "orientation_convention": "Rz*Ry*Rx",
+  "target_pose": [
+    -0.51485,
+    0.00473,
+    0.47268,
+    -3.018827,
+    0.122173,
+    0.757
+  ],
+  "actual_pose_before": [
+    -0.5148479342460632,
+    0.004730008542537689,
+    0.47267767786979675,
+    -3.018826484680176,
+    0.12217015773057938,
+    0.7570043206214905
+  ],
+  "actual_pose_after": [
+    -0.5148479342460632,
+    0.004730008542537689,
+    0.47267767786979675,
+    -3.018826723098755,
+    0.12217032164335251,
+    0.7570030093193054
+  ],
+  "time_before": "2026-09-21T11:15:05.193586",
+  "time_after": "2026-09-21T11:15:05.282461",
+  "frame": {
+    "nFrameNum": 44,
+    "nDevTimeStampHigh": 160,
+    "nDevTimeStampLow": 1238284220,
+    "nHostTimeStamp": 1789960505125
+  },
+  "validation": "before_after_checks_not_hardware_synchronized"
+}

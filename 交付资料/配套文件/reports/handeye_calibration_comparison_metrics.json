@@ -1,0 +1,161 @@
+{
+  "analysis_date": "2026-08-26",
+  "comparison": "20260731 vs 20260818",
+  "scope": "Eye-in-hand ChArUco camera calibration and hand-eye transform comparison",
+  "sources": {
+    "result_20260731": "data/debug/20260731/handeye_result_20260731_171330_046977.json",
+    "samples_20260731": "piperx-graspnet-project-main/outputs/handeye/20260731_170812/samples.json",
+    "quality_20260731": "piperx-graspnet-project-main/outputs/handeye/20260731_170812/quality_report.json",
+    "log_20260731": "logs/20260731/agv_vision.log",
+    "result_20260818": "data/debug/20260818/handeye_result_20260818_112158_004606.json",
+    "log_20260818": "logs/20260817/agv_vision.log (entries dated 2026-08-18)",
+    "log_20260821": "logs/20260821/agv_vision.log",
+    "compensation_implementation": [
+      "agv_vision/api/app.py",
+      "agv_vision/vision/compensator.py",
+      "agv_vision/core/service.py"
+    ],
+    "baseline_20260730": "pkg5_260728_2/outputs/handeye_20260730/handeye_calibration_result.json"
+    ,"desktop_photo_rerun": "outputs/handeye_20260804_rerun/handeye_calibration_result_rerun.json"
+    ,"desktop_photo_image_analysis": "reports/handeye_image_quality_desktop_vs_archive.json"
+  },
+  "batches": {
+    "20260731": {
+      "sample_count": 24,
+      "corner_count_min": 8,
+      "corner_count_max": 16,
+      "corner_count_mean": 14.2916666667,
+      "full_16_corner_frames": 13,
+      "full_16_corner_rate": 0.5416666667,
+      "camera_calibration_rms_px": 0.1655123293,
+      "hand_eye_method": "Park",
+      "translation_rmse_mm": 3.570420516,
+      "rotation_rmse_deg": 0.9219289299,
+      "quality_report_ok": false,
+      "robot_euler_convention": "Rz*Ry*Rx; auto rad/deg input",
+      "gTc_translation_mm": [-89.635344862, 10.719873875, 96.069447995],
+      "camera_matrix": {
+        "fx": 613.970269249,
+        "fy": 616.897881955,
+        "cx": 637.360465818,
+        "cy": 393.124607711
+      },
+      "dist_coeffs": [-0.021902222, 0.012999995, -0.00020037, -0.001735273, 0.002346092],
+      "robot_xy_span_mm": [39.57, 39.762],
+      "robot_z_span_mm": 39.268,
+      "rotation_from_first_median_deg": 8.01551,
+      "rotation_from_first_max_deg": 12.817179,
+      "pairwise_rotation_max_deg": 19.187698,
+      "rotation_vector_singular_values_deg": [25.839903, 24.658436, 13.870474],
+      "near_duplicate_pose_pairs": [],
+      "robot_target_error_mean_mm": 0.309509,
+      "robot_target_error_max_mm": 0.68577
+    },
+    "20260818": {
+      "sample_count": 30,
+      "corner_count_min": 16,
+      "corner_count_max": 16,
+      "corner_count_mean": 16.0,
+      "full_16_corner_frames": 30,
+      "full_16_corner_rate": 1.0,
+      "camera_calibration_rms_px": 0.1160166327,
+      "hand_eye_method": "Park",
+      "translation_rmse_mm": 0.2737832725,
+      "rotation_rmse_deg": 0.1117087172,
+      "quality_report_ok": null,
+      "robot_euler_convention": "Rz*Ry*Rx; rad input",
+      "gTc_translation_mm": [-132.567131159, -55.954000061, 65.289851369],
+      "camera_matrix": {
+        "fx": 613.160035095,
+        "fy": 612.441244606,
+        "cx": 640.889254436,
+        "cy": 405.239469037
+      },
+      "dist_coeffs": [-0.029228602, 0.076614999, 0.000084219, -0.000155837, -0.151429231],
+      "robot_xy_span_mm": [30.000959, 40.00244],
+      "robot_z_span_mm": 10.00748,
+      "rotation_from_first_median_deg": 5.000073,
+      "rotation_from_first_max_deg": 8.782538,
+      "pairwise_rotation_max_deg": 15.999942,
+      "rotation_vector_singular_values_deg": [21.71896, 15.608496, 9.230145],
+      "near_duplicate_pose_pairs": [
+        {
+          "samples": [3, 5],
+          "translation_difference_mm": 0.000627,
+          "rotation_difference_deg": 0.0
+        }
+      ],
+      "capture_timing": {
+        "first_image": "2026-08-18T11:19:13+08:00",
+        "last_image": "2026-08-18T11:21:54+08:00",
+        "duration_s": 161,
+        "median_interval_s": 6,
+        "request_received": "2026-08-18T11:21:56.928+08:00",
+        "image_paths_strictly_chronological": true
+      }
+    }
+  },
+  "derived_comparison": {
+    "batch_identity_diagnostic": {
+      "desktop_photo_count": 24,
+      "sha256_matches_outputs_handeye_20260730": 24,
+      "sha256_matches_outputs_handeye_20260804_rerun": 24,
+      "sha256_matches_archived_20260731_170812": 0,
+      "desktop_full_16_corner_frames": 22,
+      "desktop_corner_count_min_mean_max": [14, 15.8333333333, 16],
+      "desktop_p01_image_size": [1004, 627],
+      "other_desktop_image_size": [1280, 800],
+      "primary_valid_samples_after_excluding_p01": 23,
+      "primary_translation_rmse_mm": 0.247991518,
+      "primary_rotation_rmse_deg": 0.146624055,
+      "p01_scaled_sensitivity_translation_rmse_mm": 0.577707548,
+      "p01_scaled_sensitivity_rotation_rmse_deg": 1.439122521,
+      "conclusion": "The user-provided desktop photos are the successful 20260730/20260804 rerun batch and are not the archived 20260731_170812 failure batch."
+    },
+    "relative_gTc_rotation_deg": 54.3709460211,
+    "relative_gTc_translation_mm": 85.0642540009,
+    "direct_translation_delta_mm": [-42.931786297, -66.673873936, -30.779596626],
+    "translation_rmse_improvement_factor": 13.0410469713,
+    "rotation_rmse_improvement_factor": 8.2529721333,
+    "camera_rms_improvement_factor": 1.4266258676,
+    "capture_quality_diagnostic": {
+      "camera_rms_degradation_factor_20260731_vs_20260818": 1.4266258676,
+      "handeye_translation_rmse_degradation_factor_20260731_vs_20260818": 13.0410469713,
+      "conclusion": "The broader 20260731 motion plan provided adequate excitation but reduced full-board detection. Image completeness is a verified contributor, not a sufficient explanation for the 13.04x hand-eye translation error.",
+      "worst_sample_20260731": {
+        "sample": "P23",
+        "planned_motion": "Z -20 mm, RX +10 deg, RY -10 deg",
+        "detected_charuco_corners": 8
+      },
+      "actual_plan_exception_20260818": "P03 and P05 are near-duplicate robot poses despite the proposed pose table."
+    },
+    "camera_matrix_delta": {
+      "fx": -0.810234154,
+      "fy": -4.456637349,
+      "cx": 3.528788617,
+      "cy": 12.114861325
+    },
+    "baseline_20260730_to_20260818": {
+      "relative_rotation_deg": 0.3096757948,
+      "relative_translation_mm": 3.8050911524,
+      "translation_delta_mm": [-0.090321176, -0.440903825, -3.778381212]
+    },
+    "field_compensation_diagnostic": {
+      "provided_request_reference_center_delta_px": [70.820473, -5.463318],
+      "provided_request_reference_shift_estimate_mm_at_old_scale": 22.980138,
+      "provided_request_marker_edge_change_percent": -4.56748,
+      "provided_request_reference_angle_delta_deg": 1.747775,
+      "provided_request_flange_position_delta_mm": 14.478653,
+      "provided_request_flange_rz_delta_deg": 1.203211,
+      "log_20260821_repeated_calls": 26,
+      "log_20260821_reference_center_range_px": [23.302029, 22.708727],
+      "log_20260821_max_xy_compensation_norm_mm": 38.516,
+      "api_contract": "legacy response exposes dx/dy/dtheta; current targetFlangePose field contains a six-axis delta rather than an absolute pose"
+    }
+  },
+  "interpretation": {
+    "preferred_result": "20260818",
+    "confidence": "high for rejecting 20260731; moderate for production acceptance of 20260818 without an independent holdout verification",
+    "primary_reason": "The desktop photo batch and 20260818 are both high-quality calibrations with similar gTc. The separate archived 20260731_170812 batch is explicitly rejected and must not be conflated with the user's first matrix."
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "point_name": "P52",
+  "image": "P52_20260921_110606_312889.jpg",
+  "units": {
+    "position": "m",
+    "orientation": "rad"
+  },
+  "orientation_convention": "Rz*Ry*Rx",
+  "target_pose": [
+    -0.51485,
+    0.00473,
+    0.47268,
+    3.054919,
+    0.0,
+    0.757
+  ],
+  "actual_pose_before": [
+    -0.5148516893386841,
+    0.004729883279651403,
+    0.47268247604370117,
+    3.0549156665802,
+    1.3572350781032583e-06,
+    0.7570018172264099
+  ],
+  "actual_pose_after": [
+    -0.5148517489433289,
+    0.004730014130473137,
+    0.47268247604370117,
+    3.054917097091675,
+    8.268349347417825e-07,
+    0.7570018768310547
+  ],
+  "time_before": "2026-09-21T11:06:06.312889",
+  "time_after": "2026-09-21T11:06:06.427469",
+  "frame": {
+    "nFrameNum": 41,
+    "nDevTimeStampHigh": 147,
+    "nDevTimeStampLow": 3187125444,
+    "nHostTimeStamp": 1789959966267
+  },
+  "validation": "before_after_checks_not_hardware_synchronized"
+}

@@ -1,0 +1,61 @@
+{
+  "point_name": "P12",
+  "image": "P12_20260930_104539_008373.jpg",
+  "units": {
+    "position": "m",
+    "orientation": "rad"
+  },
+  "orientation_convention": "Rz*Ry*Rx",
+  "points_source": "points40_candidate_v1_20260930 / outputs/handeye_points40_20260930/points40_design.json",
+  "point_set_status": "candidate_requires_field_validation",
+  "base_pose": [
+    -0.4613124,
+    0.00933142,
+    0.5292436,
+    -3.1409895,
+    -3.11e-06,
+    0.75732857
+  ],
+  "offset_mm_deg": [
+    -17,
+    15,
+    0,
+    -4,
+    0,
+    0
+  ],
+  "offset_convention": "base_frame_xyz_plus_euler_component_offsets",
+  "target_pose": [
+    -0.4783124,
+    0.02433142,
+    0.5292436,
+    -3.210802670079773,
+    -3.11e-06,
+    0.75732857
+  ],
+  "actual_pose_before": [
+    -0.4783150851726532,
+    0.0243324376642704,
+    0.5292521715164185,
+    3.072387218475342,
+    1.0816976100613829e-05,
+    0.7573255300521851
+  ],
+  "actual_pose_after": [
+    -0.47831499576568604,
+    0.024331839755177498,
+    0.5292519927024841,
+    3.0723867416381836,
+    9.580064215697348e-06,
+    0.7573269009590149
+  ],
+  "time_before": "2026-09-30T10:45:39.008373",
+  "time_after": "2026-09-30T10:45:39.120496",
+  "frame": {
+    "nFrameNum": 769,
+    "nDevTimeStampHigh": 38,
+    "nDevTimeStampLow": 1609340778,
+    "nHostTimeStamp": 1790736338972
+  },
+  "validation": "before_after_checks_not_hardware_synchronized"
+}

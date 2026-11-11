@@ -1,0 +1,5 @@
+[project]
+name = "agv-vision"
+version = "0.2.0"
+description = "AGV vision package: ChArUco hand-eye + ArUco compensation"
+requires-python = ">=3.10"
