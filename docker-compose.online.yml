@@ -1,33 +1,52 @@
 services:
-  agv-vision-pkg5-online:
+  agv-vision-pkg6-online:
+    image: agv-vision-pkg6:local
     build:
       context: .
       dockerfile: Dockerfile
-
-    container_name: agv-vision-pkg5-online
     restart: unless-stopped
     network_mode: host
-
+    working_dir: /app
+    init: true
+    stop_grace_period: 30s
+    devices:
+      # Actual Linux device, not the numeric SDK port.
+      - "${NODKA_SERIAL_DEVICE:?Set NODKA_SERIAL_DEVICE in .env}:${NODKA_SERIAL_DEVICE:?Set NODKA_SERIAL_DEVICE in .env}"
     environment:
       TZ: Asia/Shanghai
       PYTHONUNBUFFERED: "1"
-
+      NODKA_SERIAL_DEVICE: ${NODKA_SERIAL_DEVICE:?Set NODKA_SERIAL_DEVICE in .env}
+      MVCAM_COMMON_RUNENV: /opt/MVS/lib
+      LD_LIBRARY_PATH: /opt/MVS/lib/64:/opt/MVS/lib
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./outputs:/app/outputs
       - /home/projects:/home/projects:z
-      - ./agv_vision/config/settings_online.yaml:/app/agv_vision/config/settings_online.yaml:ro
-
-    command: >
-      python -m agv_vision.main
-      --config agv_vision/config/settings_online.yaml
-      serve
-
+      - type: bind
+        source: ${MVS_RUNTIME_DIR:?Set MVS_RUNTIME_DIR in .env}
+        target: /opt/MVS/lib
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./deploy/nkio_config.ini
+        target: /app/third_party/nodka/config/nkio_config.ini
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./agv_vision/config/settings_online.yaml
+        target: /app/agv_vision/config/settings_online.yaml
+        read_only: true
+        bind:
+          create_host_path: false
+    command: ["python", "-m", "agv_vision.main", "--config", "agv_vision/config/settings_online.yaml", "serve"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; from agv_vision.config.settings import AppSettings; s=AppSettings.from_yaml('agv_vision/config/settings_online.yaml'); urllib.request.urlopen('http://127.0.0.1:%s/health' % s.service.port, timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-    # 如果使用 USB 相机，再根据实际情况启用：
-    # privileged: true
-    # devices:
-    #   - "/dev/bus/usb:/dev/bus/usb"

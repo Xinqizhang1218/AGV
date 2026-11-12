@@ -15,3 +15,8 @@ work/
 # Unrelated standalone project copied into this directory
 piperx-graspnet-project-main/
 
+
+# Machine-specific deployment paths
+.env
+.env.*
+!.env.example
